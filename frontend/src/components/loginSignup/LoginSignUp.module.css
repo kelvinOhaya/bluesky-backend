@@ -1,0 +1,89 @@
+.container {
+    /* border: 1px solid yellow; */
+    display: flex;
+    width: 80%;
+    justify-content: center;
+    align-items: center; 
+    height: 100%;
+    gap: 10%;
+}
+
+.container * {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+}
+
+.container section {
+    background: white;
+    border-radius: 20px;
+}
+
+
+.container section h1 {
+    font-weight: bold;
+    font-size: 40px;
+    margin-top: 7%;
+    margin-bottom: 1%;
+    text-align: center;
+    
+}
+/* Styling for both login and signup div */
+.registerContainer {
+    width: 100%;
+    display: flex;
+    height: 100%;
+    /* border: 1px solid red; */
+}
+
+.registerContainer div {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+    margin: 4% 4% 4% 4%;
+}
+
+.registerContainer div input {
+    border-radius: 5px;
+    border: 1px solid grey;
+    padding: 13px;
+    font-size: 1rem;
+}
+
+.registerContainer span {
+    width: 100%;
+    margin-top: 2%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.registerContainer button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 10rem;
+    height: 4rem;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.7rem;
+    font-weight: bolder;
+}
+
+.registerContainer button:hover {
+    filter: brightness(0.7);
+    cursor: pointer;
+}
+
+
+
+
+section {
+    width: 40%;
+    height: fit-content;
+    padding: 1rem 2rem 1rem 2rem;
+}
