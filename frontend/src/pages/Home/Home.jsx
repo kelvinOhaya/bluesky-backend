@@ -1,7 +1,7 @@
 import styles from "./Home.module.css";
-import "../styles/global.css";
-import twoPeopleTalking from "../assets/twoPeopleTalking.png";
-import excited from "../assets/excited.png";
+import "../../styles/global.css";
+import twoPeopleTalking from "../../assets/twoPeopleTalking.png";
+import excited from "../../assets/excited.png";
 
 function Home() {
   return (
