@@ -1,5 +1,5 @@
 import styles from "./Textbar.module.css";
-import SendIcon from "../SendIcon/SendIcon";
+import SendIcon from "../../general/icons/sendIcon/SendIcon";
 import "../../../styles/global.css";
 import { useState } from "react";
 

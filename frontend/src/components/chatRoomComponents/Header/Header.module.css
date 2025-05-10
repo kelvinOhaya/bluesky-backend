@@ -21,11 +21,12 @@
   height: 40%;
   padding: 10%;
   color: black;
-  border: 1px solid black;
+  background: #eee;
+  /* border: 1px solid black; */
 }
 
 .menuButton {
-  font-size: 4rem;
+  font-size: 3rem;
   padding-right: 5%;
   background: none;
   border: none;
@@ -33,15 +34,12 @@
   color: inherit;
 }
 
-.navList {
-  list-style: none;
-  padding: 0;
-  width: 100%;
-  border: 1px solid purple;
-}
-
 .closeBtn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
   background: rgb(170, 4, 4);
+  padding: 0 5px;
   color: white;
   margin-left: auto;
   border: none;
@@ -52,10 +50,6 @@
   cursor: pointer;
 }
 
-.closeBtnContainer {
-  width: 100%;
-  border: 1px solid red;
-}
 .closeBtn:hover {
   filter: brightness(0.7);
   font-size: 2rem;
@@ -63,4 +57,37 @@
 
 .verticalProfilePic {
   width: 40%;
+  z-index: 99;
+}
+
+.optionsContainer {
+  background: #555;
+}
+
+.optionStyling {
+  height: 70px;
+  width: 100%;
+  display: flex;
+  border: 1px solid black;
+}
+
+.optionStyling:hover {
+  filter: brightness(0.8);
+}
+.searchIcon {
+  width: 40px;
+  font-size: 20px;
+  color: #555;
+  text-shadow: 0 0 1px black; /* creates a thicker effect */
+}
+
+.optionStyling * {
+  color: #555;
+}
+
+.logout * {
+  background: red !important;
+  color: white;
+  display: flex !important;
+  justify-content: center !important;
 }

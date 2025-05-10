@@ -1,7 +1,11 @@
 import styles from "./ProfilePic.module.css";
 
 function ProfilePic({ src, alt, className }) {
-  return <img className={className} src={src} alt={alt} />;
+  return (
+    <div className={className}>
+      <img className={styles.profileImg} src={src} alt={alt} />
+    </div>
+  );
 }
 
 export default ProfilePic;
