@@ -1,11 +1,12 @@
 import styles from "./Option.module.css";
+import { useState } from "react";
+import { motion } from "framer-motion";
 
-function option({ className, children }) {
+function option({ content, icon = <div> </div>, className }) {
   return (
     <div className={className}>
-      <div className={styles.container}>
-        <button className={styles.container}>{children}</button>
-      </div>
+      <span>{icon}</span>
+      <p>{content}</p>
     </div>
   );
 }

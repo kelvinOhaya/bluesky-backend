@@ -7,8 +7,6 @@ function AppRoutes() {
   return (
     <Router>
       <Routes>
-        {/* <Route path="/" element={<Home />} /> 
-        <Route path="/register" element={<Register />} />  */}
         <Route path="/" element={<ChatRoom />} />
       </Routes>
     </Router>

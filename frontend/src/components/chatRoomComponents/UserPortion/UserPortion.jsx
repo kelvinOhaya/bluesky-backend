@@ -8,6 +8,7 @@ function UserPortion({ className }) {
           imgStyling={styles.profilePic}
           className={styles.userLabel}
           name={"Username"}
+          imgSize={45}
         />
       </div>
     </div>

@@ -11,83 +11,22 @@
 }
 
 .userLabel {
-  width: 40%;
+  /* border: 1px solid magenta; */
+  width: 30%;
   height: 100%;
+  max-height: min-content;
   padding: 10px;
-}
-
-.slidingNavbarUserLabel {
-  width: 100%;
-  height: 40%;
-  padding: 10%;
-  color: black;
-  background: #eee;
-  /* border: 1px solid black; */
-}
-
-.menuButton {
-  font-size: 3rem;
-  padding-right: 5%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: inherit;
-}
-
-.closeBtn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: rgb(170, 4, 4);
-  padding: 0 5px;
-  color: white;
-  margin-left: auto;
-  border: none;
   font-size: 2rem;
+  font-weight: bolder;
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
 }
-
-.closeBtn:hover {
-  filter: brightness(0.7);
-  font-size: 2rem;
+.userLabel img {
+  height: 6rem;
+  width: 6rem;
 }
-
-.verticalProfilePic {
-  width: 40%;
-  z-index: 99;
-}
-
-.optionsContainer {
-  background: #555;
-}
-
-.optionStyling {
-  height: 70px;
-  width: 100%;
-  display: flex;
-  border: 1px solid black;
-}
-
-.optionStyling:hover {
-  filter: brightness(0.8);
-}
-.searchIcon {
-  width: 40px;
-  font-size: 20px;
-  color: #555;
-  text-shadow: 0 0 1px black; /* creates a thicker effect */
-}
-
-.optionStyling * {
-  color: #555;
-}
-
-.logout * {
-  background: red !important;
-  color: white;
-  display: flex !important;
-  justify-content: center !important;
+.userLabel p {
+  width: 300px;
+  min-width: 300px;
 }
