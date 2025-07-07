@@ -1,0 +1,57 @@
+@import url("../../../../styles/variables.css");
+
+/* Container Styles */
+.container {
+  width: 100%;
+  height: 60px;
+  background: var(--primary);
+  padding-left: 0;
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+/* UserLabel Styles */
+.userLabel {
+  /* border: 1px solid magenta; */
+  flex: 1;
+  height: fit-content;
+  padding: 5px 5px 5px 0px;
+  font-size: 2rem;
+  font-weight: medium;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.userLabel p {
+  width: 300px;
+  min-width: 300px;
+}
+
+.joinCode {
+  min-width: fit-content;
+  font-size: 1.2rem;
+  padding-right: 2%;
+}
+
+/* Settings Icon Styles */
+.iconWrapper {
+  /* border: 1px solid yellow; */
+  padding-top: auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  padding: 11px;
+  width: fit-content;
+  height: fit-content;
+  pointer-events: auto;
+}
+
+.iconWrapper svg {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

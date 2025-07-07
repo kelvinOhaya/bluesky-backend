@@ -10,11 +10,14 @@
   /* border: 1px solid red; */
   display: flex;
   flex-direction: row;
+  overflow: hidden;
 }
+
 .nav {
   background: var(--dark-primary);
   filter: brightness(0.9);
 }
+
 .sidebarButton {
   color: white;
   background: var(--dark-primary);
@@ -30,34 +33,29 @@
   cursor: pointer;
 }
 
-.main {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
 .userPortion {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  /* border: 1px solid orange; */
 }
 
 .header {
   max-height: 100px;
   /* border: 1px solid green !important; */
 }
+
 .chatsTab {
   background: var(--dark-primary);
+  height: inherit;
+  width: 100%;
   /* border: 1px solid purple; */
 }
 
-.textbar {
-  /* border: 1px solid yellow; */
-  width: 100%;
-  margin-top: auto;
-}
 .display {
   /* border: 1px solid green; */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }

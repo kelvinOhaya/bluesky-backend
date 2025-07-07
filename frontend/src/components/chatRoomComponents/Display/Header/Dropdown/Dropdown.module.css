@@ -1,0 +1,36 @@
+@import url(../../../../../styles/variables.css);
+
+/* Container Styles */
+.container {
+  position: relative;
+  display: flex;
+  padding: 0 10px;
+  height: fit-content;
+  cursor: default;
+  margin-left: auto;
+  z-index: 99;
+  /* margin-left: auto; */
+  pointer-events: none;
+  display: inline-block;
+}
+
+/* Navbar Content Styles */
+.navbarContent {
+  position: absolute;
+  top: 100%;
+  right: 0px;
+  max-height: 0px;
+  white-space: nowrap;
+  width: fit-content;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  pointer-events: all;
+  background: var(--dark-primary);
+  font-size: 2rem;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+  overflow: hidden;
+}

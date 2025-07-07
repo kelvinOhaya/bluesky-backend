@@ -1,0 +1,19 @@
+Next Steps:
+
+ISSUE: loadChatRooms() is not loading the chat rooms,
+
+
+
+1. Add a "Room Options (bottom arrow icon)" dropdown menu that offers the following Options:
+    - Leave Room (red)
+        - "Are You Sure" Option Menu
+        - If there is one member left, take the room out of mongodb
+        - FUTURE: messages belonging to this roomID should be deleted as well
+
+fix the empty room state
+
+3. Try to join the room from another user
+
+4. Start working on socket communication
+
+5. Start adding messages to database

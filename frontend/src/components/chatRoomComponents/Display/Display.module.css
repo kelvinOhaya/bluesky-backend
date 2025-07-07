@@ -1,0 +1,23 @@
+.textbar {
+  /* border: 1px solid yellow; */
+  width: 100%;
+  margin-top: auto;
+}
+
+.header {
+  max-height: 100px;
+  /* border: 1px solid green !important; */
+}
+.messageContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  padding: 0 20px 10px;
+  flex-direction: column;
+  align-items: stretch;
+  overflow-y: scroll;
+}
+
+.messageContainer::-webkit-scrollbar {
+  display: none;
+}

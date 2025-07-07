@@ -3,29 +3,30 @@ import { useState } from "react";
 import "../../styles/global.css";
 import { motion } from "framer-motion";
 import MenuIconVertical from "../../components/general/icons/MenuIconVertical";
-import Header from "../../components/chatRoomComponents/Header/Header";
 import ChatsTab from "../../components/chatRoomComponents/ChatsTab/ChatsTab";
 import Display from "../../components/chatRoomComponents/Display/Display";
-import Textbar from "../../components/chatRoomComponents/textBar/Textbar";
 
 function ChatRoom() {
-  const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
-  const animationWidth = sidebarIsOpen ? "16.2%" : "0";
+  const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
+  const [activeGroupChat, setActiveGroupChat] = useState(0);
+  const animationWidth = sidebarIsOpen ? "300px" : "0";
   return (
     <div className={styles.container}>
       <motion.nav
-        initial={{ width: "0" }}
-        animate={{
-          width: animationWidth,
+        initial={{ width: "300px" }}
+        style={{
           pointerEvents: sidebarIsOpen ? "all" : "none",
         }}
-        transition={{ duration: "0.3" }}
+        animate={{ width: animationWidth }}
+        transition={{ duration: 0.3 }}
         className={styles.nav}
       >
         <ChatsTab
           isOpen={sidebarIsOpen}
           className={styles.chatsTab}
           width={animationWidth}
+          activeGroupChat={activeGroupChat}
+          setActiveGroupChat={setActiveGroupChat}
         />
       </motion.nav>
       <button
@@ -34,11 +35,7 @@ function ChatRoom() {
       >
         <MenuIconVertical size={15} />
       </button>
-      <main className={styles.main}>
-        <Header className={styles.header} />
-        <Display className={styles.display} />
-        <Textbar className={styles.textbar} />
-      </main>
+      <Display className={styles.display} />
     </div>
   );
 }
