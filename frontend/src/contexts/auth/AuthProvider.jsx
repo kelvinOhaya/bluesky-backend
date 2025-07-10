@@ -59,7 +59,7 @@ const AuthProvider = ({ children }) => {
       return response.status;
     } catch (error) {
       console.log("Error when trying to login: ", error);
-      return error.response.status;
+      return error.response?.status;
     }
   };
 

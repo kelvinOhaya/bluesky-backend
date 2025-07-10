@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const {storage} = require("../config/cloudinary")
+const {storage} = require("../config/coundinary")
 const upload = multer({storage})
 
 const router = express.Router();
@@ -13,3 +13,5 @@ router.post("/profile-picture", upload.single('image'), async (req, res) => {
         res.status(500).json({error: "Failed to upload image to cloudinary"})
     }
 })
+
+module.exports = router;

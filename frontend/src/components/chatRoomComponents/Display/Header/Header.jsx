@@ -1,23 +1,35 @@
 import { useEffect, useState } from "react";
 import styles from "./Header.module.css";
-import UserLabel from "../../../general/UserLabel/UserLabel";
-import Dropdown from "./Dropdown/Dropdown";
-import SearchBar from "./SearchBar/SearchBar";
-import NewGroupForm from "./NewGroupForm/NewGroupForm";
-import LeaveChatRoom from "../LeaveChatRoom/LeaveChatRoom";
-import SearchIcon from "../../../general/icons/SearchIcon";
-import ChatroomIcon from "../../../general/icons/ChatroomIcon";
-import Option from "./Option/Option";
-import LeaveIcon from "../../../general/icons/LeaveIcon";
-import PlusIcon from "../../../general/icons/PlusIcon";
-import ProfileIcon from "../../../general/icons/ProfileIcon";
-import useChatRoom from "../../../../contexts/chatRoom/useChatRoom";
-import SettingsIcon from "../../../general/icons/SettingsIcon";
-import LogoutConfirmation from "./LogoutConfirmation/LogoutConfirmation";
-import Overlay from "../../../general/Overlay/Overlay";
-import ChangeName from "./ChangeName/ChangeName";
 
-// JOIN CODE: 8TgbQI
+// General UI components
+import UserLabel from "../../../general/UserLabel/UserLabel";
+import Overlay from "../../../general/Overlay/Overlay";
+import Option from "./Option/Option";
+import Dropdown from "./Dropdown/Dropdown";
+
+// Icon components
+import {
+  SearchIcon,
+  LeaveIcon,
+  PencilIcon,
+  PlusIcon,
+  ProfileIcon,
+  SettingsIcon,
+  ChatRoomIcon,
+} from "../../../general/icons";
+
+// Dropdown option components
+import {
+  JoinRoom,
+  NewGroupForm,
+  LeaveChatRoom,
+  LogoutConfirmation,
+  ChangeName,
+  ChangeProfilePicture,
+} from "./dropdownOptions/";
+
+// Context
+import useChatRoom from "../../../../contexts/chatRoom/useChatRoom";
 
 function Header({ className }) {
   const { currentChat, isCreator, leaveChatRoom } = useChatRoom();
@@ -31,6 +43,7 @@ function Header({ className }) {
     logoutConfirmation: false,
     changeName: false,
     leaveRoom: false,
+    changeProfilePicture: false,
   });
 
   const [activeFeature, setActiveFeature] = useState(null);
@@ -65,7 +78,7 @@ function Header({ className }) {
               type={"groupOptions"}
               setIsActive={setIsActive}
               icon={
-                <ChatroomIcon
+                <ChatRoomIcon
                   isActive={isActive}
                   className={styles.iconWrapper}
                   size={34}
@@ -114,6 +127,18 @@ function Header({ className }) {
         >
           <Option
             className={styles.option}
+            icon={PencilIcon}
+            label={"Change Profile Picture"}
+            condition={dropdownFeatures.changeProfilePicture}
+            onClick={() =>
+              setDropdownFeatures({
+                dropdownFeatures,
+                changeProfilePicture: true,
+              })
+            }
+          />
+          <Option
+            className={styles.option}
             icon={PlusIcon}
             label={"Create Group Chat"}
             condition={dropdownFeatures.createGroupChat}
@@ -151,11 +176,15 @@ function Header({ className }) {
           dropdownFeatures={dropdownFeatures}
           setDropdownFeatures={setDropdownFeatures}
         />
+        <ChangeProfilePicture
+          dropdownFeatures={dropdownFeatures}
+          setDropdownFeatures={setDropdownFeatures}
+        />
         <LogoutConfirmation
           dropdownFeatures={dropdownFeatures}
           setDropdownFeatures={setDropdownFeatures}
         />
-        <SearchBar
+        <JoinRoom
           dropdownFeatures={dropdownFeatures}
           setDropdownFeatures={setDropdownFeatures}
         />

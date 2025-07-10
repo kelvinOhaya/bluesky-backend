@@ -43,7 +43,7 @@ app.use(cors({
     allowedHeader: ["Content-Type", "Authorization"]
 }))
 
-//mount all the authentication routes (consult authRoutes.js)
+//mount all the routers
 app.use("/api/auth", authRoutes)
 app.use("/api/chatroom", chatRoomRoutes)
 app.use("/api/upload", uploadRoutes)

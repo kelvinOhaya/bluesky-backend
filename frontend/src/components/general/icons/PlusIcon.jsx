@@ -1,4 +1,9 @@
-function PlusIcon({ size = 24, color = "currentColor", className }) {
+function PlusIcon({
+  size = 24,
+  color = "currentColor",
+  className,
+  type = "dropdown",
+}) {
   return (
     <div className={className}>
       <svg
@@ -8,7 +13,7 @@ function PlusIcon({ size = 24, color = "currentColor", className }) {
         viewBox="0 0 24 24"
         fill="none"
         stroke={color}
-        strokeWidth="3.5"
+        strokeWidth={type === "dropdown" ? "3.5" : "1"}
         strokeLinecap="round"
         strokeLinejoin="round"
       >

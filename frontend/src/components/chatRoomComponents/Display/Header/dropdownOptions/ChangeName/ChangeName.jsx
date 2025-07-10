@@ -1,8 +1,8 @@
 import styles from "./ChangeName.module.css";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import useChatRoom from "../../../../../contexts/chatRoom/useChatRoom";
-import api from "../../../../../utils/api";
+import useChatRoom from "../../../../../../contexts/chatRoom/useChatRoom";
+import api from "../../../../../../utils/api";
 
 function ChangeName({ dropdownFeatures, setDropdownFeatures }) {
   const { currentChat, changeName } = useChatRoom();

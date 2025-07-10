@@ -1,4 +1,4 @@
-import useChatRoom from "../../../../contexts/chatRoom/useChatRoom";
+import useChatRoom from "../../../../../../contexts/chatRoom/useChatRoom";
 import styles from "./LeaveChatRoom.module.css";
 import { motion, AnimatePresence } from "framer-motion";
 

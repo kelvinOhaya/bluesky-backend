@@ -1,8 +1,8 @@
-import Overlay from "../../../../general/Overlay/Overlay";
+import Overlay from "../../../../../general/Overlay/Overlay";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./LogoutConfirmation.module.css";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../../../../contexts/auth/useAuth";
+import useAuth from "../../../../../../contexts/auth/useAuth";
 
 function LogoutConfirmation({ dropdownFeatures, setDropdownFeatures }) {
   const { logout } = useAuth();

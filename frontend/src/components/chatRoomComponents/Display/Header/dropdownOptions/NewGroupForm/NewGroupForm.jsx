@@ -1,8 +1,8 @@
 import styles from "./NewGroupForm.module.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import useAuth from "../../../../../contexts/auth/useAuth";
-import useChatRoom from "../../../../../contexts/chatRoom/useChatRoom";
+import useAuth from "../../../../../../contexts/auth/useAuth";
+import useChatRoom from "../../../../../../contexts/chatRoom/useChatRoom";
 
 function NewGroupForm({ dropdownFeatures, setDropdownFeatures }) {
   const [groupName, setGroupName] = useState("");
