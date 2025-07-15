@@ -9,8 +9,14 @@ const userSchema = new Schema({
     username: {type: String, required: true},
     password: {type: String, required: true},
     currentChat: {type: Schema.Types.ObjectId, ref: "ChatRoom", default: null},
-    profilePic: {type: String},
-    joinCode: {type: String, required: true}
+    joinCode: {type: String, required: true},
+    profilePicture: {
+        type:  {
+            url: {type: String},
+            public_Id: {type: String}
+        },
+        default: null
+    }
 }, {timestamps: true})
 
 //run this before the "save" function

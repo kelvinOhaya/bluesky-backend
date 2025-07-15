@@ -30,9 +30,11 @@ import {
 
 // Context
 import useChatRoom from "../../../../contexts/chatRoom/useChatRoom";
+import useAuth from "../../../../contexts/auth/useAuth";
 
 function Header({ className }) {
   const { currentChat, isCreator, leaveChatRoom } = useChatRoom();
+  const { user } = useAuth();
   const [isActive, setIsActive] = useState({
     settings: false,
     groupOptions: false,
@@ -69,6 +71,7 @@ function Header({ className }) {
               className={styles.userLabel}
               name={currentChat?.name || "Group Name"}
               imgSize={37}
+              src={null}
             />
             <span className={styles.joinCode}>
               Join Code: {currentChat?.joinCode || "888888"}

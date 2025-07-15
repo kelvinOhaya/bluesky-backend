@@ -65,7 +65,7 @@ exports.sendInfo = async (req, res) => {
 exports.loadMessages = async (req, res) => {
     const {currentChatId} = req.body;
     try {
-        const foundMessages = await Message.find({chatRoom: currentChatId})
+        const foundMessages = await Message.find({chatRoom: currentChatId}).populate("sender", "username profilePicture")
         res.status(200).json({messages: foundMessages})
     } catch (error) {
         console.log("Error loading the chat rooms: ", error)
@@ -103,10 +103,8 @@ exports.updateCurrentRoom = async (req, res) => {
     const {currentRoomId} = req.body;
 
     try {
-        const foundUser = await User.findById(userId);
-        foundUser.currentChat = currentRoomId;
-        await foundUser.save();
-        return res.status(200).json({success: "true"});
+        await User.findByIdAndUpdate(userId, {currentChat: currentRoomId}, {new: true});
+        return res.sendStatus(200);
     } catch(error) {
         console.log("Error trying to find the user: ", error)
     }

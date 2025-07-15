@@ -19,11 +19,11 @@ function Display({ className }) {
     <div className={className}>
       <Header />
       <div className={styles.messageContainer}>
-        {messages?.map((message) => {
+        {messages?.map((message, index) => {
           return (
             <Message
-              key={message._id}
-              isSender={user.username === message.sender}
+              key={message._id || index}
+              isSender={user.username === message.sender.username}
               ref={bottomTextMessageRef}
               message={message}
             />

@@ -5,7 +5,6 @@ const http = require("http")
 const {Server} = require("socket.io")
 const authRoutes = require("./routes/authRoutes")
 const chatRoomRoutes = require("./routes/chatRoomRoutes")
-const uploadRoutes = require("./routes/upload")
 const cookieParser = require("cookie-parser")
 const connectDB = require("./config/db")
 require("dotenv").config()
@@ -29,7 +28,7 @@ const io = new Server(server, {
         methods: ["GET", "POST"]
     }
 })
-
+const uploadRoutes = require("./routes/upload")(io)
 //initialize socketio's logic
 initSocket(io)
 server.listen(port)
@@ -59,3 +58,5 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
+
+module.exports = { io }

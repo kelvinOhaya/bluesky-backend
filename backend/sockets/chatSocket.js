@@ -25,21 +25,38 @@ function initSocket (io) {
 
         //for sending messages to everyone in the room
         socket.on("send-message", async (message)=> {
+            console.log(message)
             const newMessage = new Message({
-                sender: message.sender,
+                sender: message.sender._id,
                 chatRoom: message.chatRoomId,
-                content: message.content
+                content: message.content,
             })
+            const clientMessage = {
+                sender: {
+                    username: message.sender.username,
+                    profilePicture: message.sender.profilePicture
+                },
+                chatRoom: message.chatRoomId,
+                content: message.content,
+            }
 
-            console.log("The new message: ", newMessage)
+
+            console.log("The new message: ", clientMessage)
             await newMessage.save()
-            io.to(message.chatRoomId).emit("receive-message", newMessage)
+            io.to(message.chatRoomId).emit("receive-message", clientMessage)
+        })
+
+        socket.on("update-profile-picture", (user) => {
+            const foundUser = user;
+            console.log(user.currentChat)
+            io.to(user.currentChat).emit("receive-photo-update", foundUser)
+
         })
 
         //for changing the group name for everybody
         socket.on("change-room-name", (foundChatRoom) => {
             console.log(`Found chat room: ${foundChatRoom}\n New name: ${foundChatRoom.name}\nCurrent Chat Id: ${foundChatRoom._id}` )
-            io.to(foundChatRoom._id).emit("update-room-name", foundChatRoom);
+            io.to(foundChatRoom._id.toString()).emit("update-room-name", foundChatRoom);
         })
     })
 

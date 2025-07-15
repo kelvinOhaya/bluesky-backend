@@ -33,10 +33,10 @@ const AuthProvider = ({ children }) => {
     refresh();
   }, []);
 
-  // useEffect(() => {
-  //   if (!user) return;
-  //   console.log(user);
-  // }, [user]);
+  useEffect(() => {
+    if (!accessToken) return;
+    console.log(accessToken);
+  }, [accessToken]);
   //creates a user in mongodb and gets a refresh token in cookies and access token for the user
   const signUp = async (credentials) => {
     try {
@@ -92,6 +92,7 @@ const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        setUser,
         login,
         signUp,
         logout,

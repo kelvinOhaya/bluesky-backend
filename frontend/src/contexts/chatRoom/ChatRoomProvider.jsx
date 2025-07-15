@@ -5,7 +5,7 @@ import useSocket from "../socket/useSocket";
 import api from "../../utils/api";
 
 function ChatRoomProvider({ children }) {
-  const { user, isLoading, accessToken } = useAuth();
+  const { user, setUser, isLoading, accessToken } = useAuth();
   const { socket } = useSocket();
   const [isCreator, setIsCreator] = useState(null);
   const [chatRooms, setChatRooms] = useState(null);
@@ -50,13 +50,35 @@ function ChatRoomProvider({ children }) {
       setCurrentChat(foundChatRoom);
     };
 
+    const updateProfilePicture = (foundUser) => {
+      if (foundUser._id === user._id) {
+        console.log("YOU HAVE SOME NEW DATA", foundUser);
+        setUser((prev) => {
+          return {
+            ...prev,
+            profilePicture: foundUser.profilePicture,
+          };
+        });
+        console.log(user);
+      }
+      setMessages((prev) => {
+        return prev.map((message) => {
+          return message.sender.username === foundUser.username //wont work because sender is populated on the frontend
+            ? { ...message, profilePicture: foundUser.profilePicture }
+            : message;
+        });
+      });
+    };
+
     //listeners
     socket.on("receive-message", handleReceiveMessage);
     socket.on("update-room-name", updateCurrentChat);
+    socket.on("receive-photo-update", updateProfilePicture);
 
     return () => {
       socket.off("receive-message", handleReceiveMessage);
       socket.off("update-room-name", updateCurrentChat);
+      socket.off("receive-photo-update", updateProfilePicture);
     };
   }, [socket]);
 
@@ -168,10 +190,11 @@ function ChatRoomProvider({ children }) {
   };
 
   const sendMessage = (chatRoomId, content) => {
+    console.log(user);
     socket.emit("send-message", {
       chatRoomId,
       content,
-      sender: user.username,
+      sender: user,
     });
   };
 
