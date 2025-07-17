@@ -3,8 +3,8 @@ import Home from "./pages/Home/Home";
 import Register from "./pages/Register/Register";
 import ChatRoom from "./pages/ChatRoom/ChatRoom";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import ChatRoomProvider from "./contexts/chatRoom/chatRoomProvider";
-import SocketProvider from "./contexts/socket/socketProvider";
+import ChatRoomProvider from "./contexts/chatRoom/ChatRoomProvider";
+import SocketProvider from "./contexts/socket/SocketProvider";
 import AuthProvider from "./contexts/auth/AuthProvider";
 
 function AppRoutes() {
