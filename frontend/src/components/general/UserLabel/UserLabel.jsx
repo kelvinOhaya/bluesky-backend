@@ -2,7 +2,7 @@ import styles from "./UserLabel.module.css";
 import ProfilePic from "../ProfilePic/ProfilePic";
 import DefaultProfile from "../../../assets/defaultProfile.jpg";
 
-function UserLabel({ className, src = null, alt, name, orientation, imgSize }) {
+function UserLabel({ className, src, alt, name, orientation, imgSize }) {
   return (
     <div className={className}>
       <div

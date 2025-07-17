@@ -24,7 +24,7 @@ module.exports = (io) => {
 
             const newProfilePicture = {url: imageUrl, public_Id: req.file.filename}
 
-            await User.findByIdAndUpdate(req.user.id, {$set: {profilePicture: newProfilePicture}}, {new: true})
+            await User.findByIdAndUpdate(req.user.id, {profilePicture: newProfilePicture})
 
             return res.status(200).json({foundUser})
         } catch (error) {

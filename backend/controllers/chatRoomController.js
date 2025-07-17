@@ -46,8 +46,14 @@ exports.sendInfo = async (req, res) => {
     try {
         const [foundUser, filteredChatRooms] = await Promise.all([
             User.findById(senderId),
-            ChatRoom.find({"members": {$in: [senderId]}}),
+            ChatRoom.find({"members": {$in: [senderId]}}).populate({
+                path: "members",
+                match: {isGroup: true},
+                select: "username profilePicture _id"
+            }),
         ])
+
+
 
         if(filteredChatRooms.length === 0) return res.status(200).json({message: "empty"})
         const currentChat = await ChatRoom.findById(foundUser.currentChat)

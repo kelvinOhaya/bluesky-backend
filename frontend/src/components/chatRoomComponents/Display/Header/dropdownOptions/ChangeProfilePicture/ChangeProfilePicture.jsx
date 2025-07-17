@@ -16,7 +16,6 @@ function ChangeProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
   const fileRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const onDrop = useCallback((acceptedFiles) => {
-    console.log(acceptedFiles[0]);
     setPreview(
       acceptedFiles.map((file) =>
         Object.assign(file, {
@@ -39,7 +38,6 @@ function ChangeProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
 
       if (data.foundUser) {
         // setIsLoading(false);
-        console.log(" YOU HAVE FOUND THE USER");
         socket.emit("update-profile-picture", user);
       }
     } catch (error) {

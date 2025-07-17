@@ -5,7 +5,7 @@ import useSocket from "../socket/useSocket";
 import api from "../../utils/api";
 
 function ChatRoomProvider({ children }) {
-  const { user, setUser, isLoading, accessToken } = useAuth();
+  const { user, isLoading, accessToken, fetchUser } = useAuth();
   const { socket } = useSocket();
   const [isCreator, setIsCreator] = useState(null);
   const [chatRooms, setChatRooms] = useState(null);
@@ -13,14 +13,13 @@ function ChatRoomProvider({ children }) {
   const [messages, setMessages] = useState(null);
 
   const activateChat = async (element) => {
-    const { data } = await api.put("/chatroom/update-current-room", {
+    await api.put("/chatroom/update-current-room", {
       currentRoomId: element._id,
     });
 
     // console.log(data.success);
     setCurrentChat(element);
     setIsCreator(user._id === element.creator);
-    console.log(isCreator);
   };
 
   //join a room when a chat is selected
@@ -35,13 +34,10 @@ function ChatRoomProvider({ children }) {
     if (!socket) return;
     //utilities
     const handleReceiveMessage = (message) => {
-      console.log("Event received!");
       setMessages((prev) => (prev ? [...prev, message] : [message]));
     };
 
     const updateCurrentChat = (foundChatRoom) => {
-      console.log("We found this chat room: ", foundChatRoom);
-      console.log("We found this new name: ", foundChatRoom.name);
       setChatRooms((prev) =>
         prev.map((room) =>
           room._id === foundChatRoom._id ? foundChatRoom : room
@@ -50,16 +46,9 @@ function ChatRoomProvider({ children }) {
       setCurrentChat(foundChatRoom);
     };
 
-    const updateProfilePicture = (foundUser) => {
+    const updateProfilePicture = async (foundUser) => {
       if (foundUser._id === user._id) {
-        console.log("YOU HAVE SOME NEW DATA", foundUser);
-        setUser((prev) => {
-          return {
-            ...prev,
-            profilePicture: foundUser.profilePicture,
-          };
-        });
-        console.log(user);
+        await fetchUser();
       }
       setMessages((prev) => {
         return prev.map((message) => {
@@ -128,12 +117,6 @@ function ChatRoomProvider({ children }) {
   };
 
   useEffect(() => {
-    if (!chatRooms) return;
-
-    console.log(chatRooms);
-  }, [chatRooms]);
-
-  useEffect(() => {
     if (!currentChat) return;
 
     setIsCreator(user._id === currentChat.creator);
@@ -177,10 +160,9 @@ function ChatRoomProvider({ children }) {
   const leaveChatRoom = async () => {
     if (!currentChat?._id) return;
     try {
-      const result = await api.delete("/chatroom/leave-room", {
+      await api.delete("/chatroom/leave-room", {
         data: { currentRoomId: currentChat?._id },
       });
-      console.log("Loaded twin");
       const { data } = await api.get("/chatroom/send-info");
       setChatRooms(data.chatRooms);
       setCurrentChat(null);
@@ -190,7 +172,6 @@ function ChatRoomProvider({ children }) {
   };
 
   const sendMessage = (chatRoomId, content) => {
-    console.log(user);
     socket.emit("send-message", {
       chatRoomId,
       content,

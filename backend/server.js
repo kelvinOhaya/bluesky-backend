@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser")
 const connectDB = require("./config/db")
 require("dotenv").config()
 const port = process.env.BACKEND_PORT
+const path = require("path")
 const initSocket = require("./sockets/chatSocket")
 
 //connect to mongodb (consult db.js)
@@ -46,6 +47,12 @@ app.use(cors({
 app.use("/api/auth", authRoutes)
 app.use("/api/chatroom", chatRoomRoutes)
 app.use("/api/upload", uploadRoutes)
+
+app.use(express.static(path.join(__dirname, "..", "frontend", "dist")));
+
+app.get("/{*any}", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "frontend", "dist", "index.html"));
+});
 
 //intro code
 app.get("/", (req, res) => {

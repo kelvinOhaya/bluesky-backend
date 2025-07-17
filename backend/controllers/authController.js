@@ -117,7 +117,7 @@ exports.logout = (req, res) => {
     try {
         res.clearCookie("refreshToken", {
             httpOnly: true,
-            secure: false, //true in production
+            secure: true,
             sameSite: "Strict",
             path: "/"
         })

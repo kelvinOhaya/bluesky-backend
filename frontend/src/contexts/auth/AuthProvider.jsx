@@ -26,17 +26,12 @@ const AuthProvider = ({ children }) => {
         setAccessToken(null);
       } finally {
         setIsLoading(false);
-        console.log(user);
       }
     };
     injectAuthToken(() => accessToken, setAccessToken);
     refresh();
   }, []);
 
-  useEffect(() => {
-    if (!accessToken) return;
-    console.log(accessToken);
-  }, [accessToken]);
   //creates a user in mongodb and gets a refresh token in cookies and access token for the user
   const signUp = async (credentials) => {
     try {
@@ -75,11 +70,7 @@ const AuthProvider = ({ children }) => {
     if (!token) return;
 
     try {
-      const { data } = await api.get("/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data } = await api.get("/auth/me");
       //   console.log("Current User", user);
       setUser(data.user);
     } catch (error) {
@@ -96,6 +87,7 @@ const AuthProvider = ({ children }) => {
         login,
         signUp,
         logout,
+        fetchUser,
         accessToken,
         setAccessToken,
         isLoading,
