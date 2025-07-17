@@ -8,7 +8,7 @@ const chatRoomRoutes = require("./routes/chatRoomRoutes")
 const cookieParser = require("cookie-parser")
 const connectDB = require("./config/db")
 require("dotenv").config()
-const port = process.env.BACKEND_PORT
+const port = process.env.PORT || 5000
 const path = require("path")
 const initSocket = require("./sockets/chatSocket")
 
