@@ -1,4 +1,4 @@
-import styles from "./chatRoom.module.css";
+import styles from "./ChatRoom.module.css";
 import { useState } from "react";
 import "../../styles/global.css";
 import { motion } from "framer-motion";
