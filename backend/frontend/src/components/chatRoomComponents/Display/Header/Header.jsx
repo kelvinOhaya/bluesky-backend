@@ -26,7 +26,7 @@ import {
   LogoutConfirmation,
   ChangeName,
   ChangeProfilePicture,
-} from "./dropdownOptions/";
+} from "./dropdownOptions";
 
 // Context
 import useChatRoom from "../../../../contexts/chatRoom/useChatRoom";

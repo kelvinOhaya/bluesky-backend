@@ -48,10 +48,10 @@ app.use("/api/auth", authRoutes)
 app.use("/api/chatroom", chatRoomRoutes)
 app.use("/api/upload", uploadRoutes)
 
-app.use(express.static(path.join(__dirname, "..", "frontend", "dist")));
+app.use(express.static(path.join(__dirname, "frontend", "dist")));
 
 app.get("/{*any}", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "frontend", "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
 //intro code
