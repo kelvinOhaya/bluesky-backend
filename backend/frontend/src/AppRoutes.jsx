@@ -6,7 +6,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import ChatRoomProvider from "./contexts/chatRoom/ChatRoomProvider";
 import SocketProvider from "./contexts/socket/SocketProvider";
 import AuthProvider from "./contexts/auth/AuthProvider";
-
+//the app routes
 function AppRoutes() {
   return (
     <Router>
