@@ -24,7 +24,7 @@ const server = http.createServer(app)
 const io = new Server(server, {
     cors: {
         credentials: true,
-        origin: process.env.FRONTEND_URL,
+        origin: "https://solo-chat-app.onrender.com",
         allowedHeader: ["Content-Type", "Authorization"],
         methods: ["GET", "POST"]
     }
