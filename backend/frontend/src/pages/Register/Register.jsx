@@ -1,6 +1,6 @@
 import Login from "../../components/loginSignUp/Login";
 import SignUp from "../../components/loginSignUp/SignUp";
-import styles from "./register.module.css";
+import styles from "./Register.module.css";
 import { useNavigate } from "react-router-dom";
 import "../../styles/global.css";
 
