@@ -1,12 +1,29 @@
 import styles from "./ChatRoom.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../../styles/global.css";
 import { motion } from "framer-motion";
+import useChatRoom from "../../contexts/chatRoom/useChatRoom";
+import useSocket from "../../contexts/socket/useSocket";
+import useAuth from "../../contexts/auth/useAuth";
 import MenuIconVertical from "../../components/general/icons/MenuIconVertical";
 import ChatsTab from "../../components/chatRoomComponents/ChatsTab/ChatsTab";
 import Display from "../../components/chatRoomComponents/Display/Display";
 
 function ChatRoom() {
+  const { isLoading, loadChatRooms } = useChatRoom();
+  const { user, accessToken, fetchUser } = useAuth();
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    // loadMessage()
+    const fetchChatRooms = async () => {
+      if (!isLoading && user && accessToken && socket != null) {
+        await loadChatRooms();
+      }
+    };
+    fetchChatRooms();
+  }, []);
+
   const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
   const [activeGroupChat, setActiveGroupChat] = useState(0);
   const animationWidth = sidebarIsOpen ? "300px" : "0";

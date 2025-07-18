@@ -4,7 +4,6 @@ import useAuth from "../contexts/auth/useAuth";
 
 const ProtectedRoute = ({ children }) => {
   const { user, isLoading } = useAuth();
-  const location = useLocation();
 
   const loadingStyle = {
     position: "absolute",
@@ -20,7 +19,6 @@ const ProtectedRoute = ({ children }) => {
       </div>
     );
   if (!user) {
-    localStorage.setItem("lastVisited", location.pathname);
     return <Navigate to="/register" replace />;
   }
 

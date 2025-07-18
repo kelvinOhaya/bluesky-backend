@@ -1,15 +1,24 @@
 import Overlay from "../../../../../general/Overlay/Overlay";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./LogoutConfirmation.module.css";
-import { useNavigate } from "react-router-dom";
+import useChatRoom from "../../../../../../contexts/chatRoom/useChatRoom";
 import useAuth from "../../../../../../contexts/auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 function LogoutConfirmation({ dropdownFeatures, setDropdownFeatures }) {
-  const { logout } = useAuth();
+  const { logout, setUser } = useAuth();
   const navigate = useNavigate();
+  const { setIsCreator, setChatRooms, setCurrentChat, setMessages } =
+    useChatRoom();
 
   const handleLogout = async () => {
+    setIsCreator(null);
+    setChatRooms(null);
+    setCurrentChat(null);
+    setMessages(null);
+    setUser(null);
     await logout();
+
     navigate("/");
   };
 

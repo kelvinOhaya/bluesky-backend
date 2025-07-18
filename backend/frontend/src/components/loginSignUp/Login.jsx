@@ -22,8 +22,8 @@ function Login() {
 
     const loginStatus = await login({ username, password });
     if (loginStatus === 200) {
-      const last = localStorage.getItem("lastVisited") || "/chatroom";
-      navigate(last);
+      const last = "/chatroom";
+      window.location.href = last;
     } else {
       setUsernameOrPasswordIsIncorrect(true);
     }

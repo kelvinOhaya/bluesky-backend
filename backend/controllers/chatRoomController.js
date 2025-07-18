@@ -40,7 +40,6 @@ exports.joinRoom = async (req, res) => {
 exports.sendInfo = async (req, res) => {
     const senderId = req.user.id
 
-    console.log("A user has asked for chat room info: ")
 
     //find all chat rooms where the user's Id is in there
     try {

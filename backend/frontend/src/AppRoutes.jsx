@@ -11,22 +11,22 @@ function AppRoutes() {
   return (
     <Router>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/chatroom"
-            element={
-              <ProtectedRoute>
-                <SocketProvider>
-                  <ChatRoomProvider>
+        <SocketProvider>
+          <ChatRoomProvider>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/chatroom"
+                element={
+                  <ProtectedRoute>
                     <ChatRoom />
-                  </ChatRoomProvider>
-                </SocketProvider>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </ChatRoomProvider>
+        </SocketProvider>
       </AuthProvider>
     </Router>
   );

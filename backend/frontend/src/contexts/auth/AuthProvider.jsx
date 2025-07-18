@@ -6,8 +6,14 @@
 import { useState, useEffect } from "react";
 import api, { injectAuthToken } from "../../utils/api";
 import AuthContext from "./AuthContext";
+import useChatRoom from "../chatRoom/useChatRoom";
 
 const AuthProvider = ({ children }) => {
+  //   const [isCreator, setIsCreator] = useState(null);
+  // const [chatRooms, setChatRooms] = useState(null);
+  // const [currentChat, setCurrentChat] = useState(null);
+  // const [messages, setMessages] = useState(null);
+
   //the accessToken from the backend, the user data, and checking if the website is loading
   const [accessToken, setAccessToken] = useState(null);
   const [user, setUser] = useState(null);
@@ -36,8 +42,8 @@ const AuthProvider = ({ children }) => {
   const signUp = async (credentials) => {
     try {
       const response = await api.post("/auth/signup", credentials);
-      setAccessToken(response.data.accessToken);
       await fetchUser(response.data.accessToken);
+      setAccessToken(response.data.accessToken);
       return response.status;
     } catch (error) {
       console.log("Error when trying to login: ", error);
@@ -61,18 +67,23 @@ const AuthProvider = ({ children }) => {
   //send a post request to the logout route to delete the access and refresh tokens, and set the state accordingly
   const logout = async () => {
     await api.post("/auth/logout");
+    sessionStorage.setItem("reloaded", "false");
     setAccessToken(null);
     setUser(null);
   };
 
   //get the user data from the /me route (doesn't include the password)
-  const fetchUser = async (token = accessToken) => {
+  const fetchUser = async (token) => {
     if (!token) return;
 
     try {
-      const { data } = await api.get("/auth/me");
-      //   console.log("Current User", user);
+      const { data } = await api.get("/auth/me", {
+        header: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setUser(data.user);
+      console.log("Current User", data.user);
     } catch (error) {
       setUser(null);
       console.log("Error getting the user from the api: ", error);

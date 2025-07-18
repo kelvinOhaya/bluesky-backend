@@ -11,6 +11,10 @@ require("dotenv").config()
 const port = process.env.PORT || 5000
 const path = require("path")
 const initSocket = require("./sockets/chatSocket")
+const allowedOrigins = process.env.NODE_ENV === "production"
+  ? ["https://solo-chat-app.onrender.com"]
+  : ["http://localhost:5173"];
+
 
 //connect to mongodb (consult db.js)
 connectDB();
@@ -24,29 +28,32 @@ const server = http.createServer(app)
 const io = new Server(server, {
     cors: {
         credentials: true,
-        origin: "https://solo-chat-app.onrender.com",
-        allowedHeader: ["Content-Type", "Authorization"],
+        origin: allowedOrigins,
+  },
+        allowedHeaders: ["Content-Type", "Authorization"],
         methods: ["GET", "POST"]
     }
-})
+)
 const uploadRoutes = require("./routes/upload")(io)
-//initialize socketio's logic
-initSocket(io)
-server.listen(port)
 
 //allows use for json, parsing cookies, and cors
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
     credentials: true,//allows us to use cookies in our requests
-    origin: process.env.FRONTEND_URL,//allow the frontend to make requests to this server
-    allowedHeader: ["Content-Type", "Authorization"]
+    origin:  allowedOrigins,
+  //allow the frontend to make requests to this server
+    allowedHeaders: ["Content-Type", "Authorization"]
 }))
+
+//initialize socketio's logic
+initSocket(io)
 
 //mount all the routers
 app.use("/api/auth", authRoutes)
 app.use("/api/chatroom", chatRoomRoutes)
 app.use("/api/upload", uploadRoutes)
+
 
 app.use(express.static(path.join(__dirname, "frontend", "dist")));
 
@@ -54,15 +61,12 @@ app.get("/{*any}", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
 
-//intro code
-app.get("/", (req, res) => {
-    res.json({intro: "Hello Express!"})
-})
+
 
 
 
 //listen on this port, and do the following function once listening.
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
 

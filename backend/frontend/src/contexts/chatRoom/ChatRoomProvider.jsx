@@ -72,16 +72,6 @@ function ChatRoomProvider({ children }) {
   }, [socket]);
 
   //initial load of all chatRooms and messages
-  useEffect(() => {
-    // loadMessage()
-    const fetchChatRooms = async () => {
-      if (!isLoading && user && accessToken && socket != null) {
-        await loadChatRooms();
-      }
-    };
-
-    fetchChatRooms();
-  }, [isLoading, user, accessToken, socket]);
 
   const loadChatRooms = async () => {
     try {
@@ -206,11 +196,13 @@ function ChatRoomProvider({ children }) {
         currentChat,
         setCurrentChat,
         isCreator,
+        setIsCreator,
         createGroup,
         verifyJoinCode,
         joinRoom,
         activateChat,
         leaveChatRoom,
+        loadChatRooms,
         sendMessage,
         changeName,
       }}
