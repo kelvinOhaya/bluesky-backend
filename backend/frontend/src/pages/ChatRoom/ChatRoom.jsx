@@ -10,12 +10,13 @@ import ChatsTab from "../../components/chatRoomComponents/ChatsTab/ChatsTab";
 import Display from "../../components/chatRoomComponents/Display/Display";
 
 function ChatRoom() {
-  const { isLoading, loadChatRooms } = useChatRoom();
+  const { isLoading, loadChatRooms, currentChat } = useChatRoom();
   const { user, accessToken, fetchUser } = useAuth();
   const { socket } = useSocket();
 
   useEffect(() => {
     // loadMessage()
+
     const fetchChatRooms = async () => {
       if (!isLoading && user && accessToken && socket != null) {
         await loadChatRooms();

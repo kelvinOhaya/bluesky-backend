@@ -5,15 +5,14 @@ const http = require("http")
 const {Server} = require("socket.io")
 const authRoutes = require("./routes/authRoutes")
 const chatRoomRoutes = require("./routes/chatRoomRoutes")
+const uploadRoutes = require("./routes/uploadRoutes")
 const cookieParser = require("cookie-parser")
 const connectDB = require("./config/db")
 require("dotenv").config()
-const port = process.env.PORT || 5000
+const port =  5000;
 const path = require("path")
 const initSocket = require("./sockets/chatSocket")
-const allowedOrigins = process.env.NODE_ENV === "production"
-  ? ["https://solo-chat-app.onrender.com"]
-  : ["http://localhost:5173"];
+const allowedOrigins = process.env.FRONTEND_URL
 
 
 //connect to mongodb (consult db.js)
@@ -29,12 +28,11 @@ const io = new Server(server, {
     cors: {
         credentials: true,
         origin: allowedOrigins,
-  },
         allowedHeaders: ["Content-Type", "Authorization"],
         methods: ["GET", "POST"]
-    }
+    },
+  }
 )
-const uploadRoutes = require("./routes/upload")(io)
 
 //allows use for json, parsing cookies, and cors
 app.use(express.json())

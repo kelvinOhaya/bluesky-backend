@@ -44,7 +44,18 @@ function ChatsTab({ className }) {
                   {/* UserLabel displays the chat room's name horizontally */}
                   <UserLabel
                     className={styles.userLabel}
-                    name={chatRoom.name}
+                    name={
+                      chatRoom.isGroup
+                        ? chatRoom.otherUser?.username
+                        : chatRoom.name
+                    }
+                    src={
+                      chatRoom.isGroup
+                        ? chatRoom.otherUser.profilePicture?.url || null
+                        : chatRoom.profilePicture?.url
+                        ? chatRoom.profilePicture.url
+                        : null
+                    }
                     orientation={"horizontal"}
                   />
                 </button>

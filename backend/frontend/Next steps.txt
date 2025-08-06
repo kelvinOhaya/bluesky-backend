@@ -1,8 +1,5 @@
 Next Steps:
 
-Group Pictures:
-- Anybody can create/modify the group Picture
-
 DM Logic:
 other person's Profile picture should show where the group chat picture shows
 User should see other person's name in the Group title
@@ -16,6 +13,18 @@ otherMember = state variable that is set to be the user that does not have the s
 *try to change this variable every time the current chat changes if isGroup is set to true
 
 No need for the groupOptions tab( or i guess you can just change "leave chat room" to "stop communication")
--Give user a warning asking if they are sure, and letting them know that if they are the last person in the chat, the messages will dissapear forever.
+-Give user a warning asking if they are sure, and letting them know that if they are the last person in the chat, the messages will disappear forever.
+
+Starts with
+
+-user finding someone's joincode
+-A dm is created with them as the members
 
 
+-Added to the list
+-When clicked on, it renders:
+        1. The other person's name as the title
+        2. Their profile
+    if isGroup is set to true.
+
+-Use username to differentiate between the users

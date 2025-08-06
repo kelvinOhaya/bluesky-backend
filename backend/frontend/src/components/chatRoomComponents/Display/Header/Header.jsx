@@ -9,10 +9,10 @@ import Dropdown from "./Dropdown/Dropdown";
 
 // Icon components
 import {
-  SearchIcon,
-  LeaveIcon,
-  PencilIcon,
   PlusIcon,
+  LeaveIcon,
+  SearchIcon,
+  PencilIcon,
   ProfileIcon,
   SettingsIcon,
   ChatRoomIcon,
@@ -21,11 +21,13 @@ import {
 // Dropdown option components
 import {
   JoinRoom,
+  ChangeName,
   NewGroupForm,
   LeaveChatRoom,
   LogoutConfirmation,
-  ChangeName,
   ChangeProfilePicture,
+  ChangeGroupProfilePicture,
+  FindUser,
 } from "./dropdownOptions";
 
 // Context
@@ -42,10 +44,12 @@ function Header({ className }) {
   const [dropdownFeatures, setDropdownFeatures] = useState({
     createGroupChat: false,
     roomSearch: false,
+    userSearch: false,
     logoutConfirmation: false,
     changeName: false,
     leaveRoom: false,
     changeProfilePicture: false,
+    changeGroupProfilePicture: false,
   });
 
   const [activeFeature, setActiveFeature] = useState(null);
@@ -65,17 +69,29 @@ function Header({ className }) {
   return (
     <div className={className}>
       <div className={styles.container}>
-        {currentChat != null && (
+        {currentChat && (
           <>
             <UserLabel
               className={styles.userLabel}
-              name={currentChat?.name || "Group Name"}
+              name={
+                currentChat?.isGroup === true
+                  ? currentChat.otherUser?.username ?? "Loading..."
+                  : currentChat.name
+              }
               imgSize={37}
-              src={null}
+              src={
+                currentChat.isGroup
+                  ? currentChat.otherUser.profilePicture?.url || null
+                  : currentChat.profilePicture?.url
+                  ? currentChat.profilePicture.url
+                  : null
+              }
             />
-            <span className={styles.joinCode}>
-              Join Code: {currentChat?.joinCode || "888888"}
-            </span>
+            {!currentChat.isGroup && (
+              <span className={styles.joinCode}>
+                Join Code: {currentChat?.joinCode || "999999"}
+              </span>
+            )}
             <Dropdown
               isActive={isActive.groupOptions}
               type={"groupOptions"}
@@ -89,17 +105,30 @@ function Header({ className }) {
               }
             >
               {isCreator && (
-                <Option
-                  className={styles.option}
-                  icon={PlusIcon}
-                  label={"Change Group Name"}
-                  onClick={() =>
-                    setDropdownFeatures({
-                      dropdownFeatures,
-                      changeName: true,
-                    })
-                  }
-                />
+                <>
+                  <Option
+                    className={styles.option}
+                    icon={PencilIcon}
+                    label={"Change Group Picture"}
+                    onClick={() =>
+                      setDropdownFeatures({
+                        dropdownFeatures,
+                        changeGroupProfilePicture: true,
+                      })
+                    }
+                  />
+                  <Option
+                    className={styles.option}
+                    icon={PlusIcon}
+                    label={"Change Group Name"}
+                    onClick={() =>
+                      setDropdownFeatures({
+                        dropdownFeatures,
+                        changeName: true,
+                      })
+                    }
+                  />
+                </>
               )}
               <Option
                 className={styles.option}
@@ -151,15 +180,24 @@ function Header({ className }) {
           />
           <Option
             className={styles.option}
+            icon={ProfileIcon}
+            onClick={() =>
+              setDropdownFeatures({ dropdownFeatures, userSearch: true })
+            }
+            label={"Find Other Users"}
+          />
+          <Option
+            className={styles.option}
             icon={SearchIcon}
             onClick={() =>
               setDropdownFeatures({ dropdownFeatures, roomSearch: true })
             }
-            label={"Find Chat/User"}
+            label={"Find Group Chats"}
           />
+
           <Option
             className={styles.option}
-            icon={ProfileIcon}
+            icon={LeaveIcon}
             label={"Logout"}
             onClick={() =>
               setDropdownFeatures({
@@ -170,7 +208,7 @@ function Header({ className }) {
           />
         </Dropdown>
 
-        {/* Put the dopdown features here */}
+        {/* Put the dropdown features here */}
         <NewGroupForm
           dropdownFeatures={dropdownFeatures}
           setDropdownFeatures={setDropdownFeatures}
@@ -191,7 +229,15 @@ function Header({ className }) {
           dropdownFeatures={dropdownFeatures}
           setDropdownFeatures={setDropdownFeatures}
         />
+        <FindUser
+          dropdownFeatures={dropdownFeatures}
+          setDropdownFeatures={setDropdownFeatures}
+        />
         <ChangeName
+          dropdownFeatures={dropdownFeatures}
+          setDropdownFeatures={setDropdownFeatures}
+        />
+        <ChangeGroupProfilePicture
           dropdownFeatures={dropdownFeatures}
           setDropdownFeatures={setDropdownFeatures}
         />

@@ -52,6 +52,11 @@ function initSocket (io) {
             io.to(user.currentChat).emit("receive-photo-update", foundUser)
 
         })
+        //add the socket event for group events
+        socket.on("update-group-profile-picture", (currentChat) => {
+            console.log("GROUP SOCKET STARTING\n--CURRENT CHAT: \n", currentChat)
+            io.to(currentChat._id).emit("receive-group-photo-update", currentChat)
+        })
 
         //for changing the group name for everybody
         socket.on("change-room-name", (foundChatRoom) => {

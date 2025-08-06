@@ -4,13 +4,7 @@ import useAuth from "../../../../contexts/auth/useAuth";
 
 function Message({ message, className, ref, isSender }) {
   const { user } = useAuth();
-  const currentTime = new Date(message.createdAt)
-    .toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    })
-    .toLowerCase();
+
   return (
     <div
       className={styles.container}
@@ -38,7 +32,13 @@ function Message({ message, className, ref, isSender }) {
         <p>{message.content}</p>
       </div>
       <span className={isSender ? styles.senderDetails : styles.receiveDetails}>
-        {currentTime}
+        {new Date(message.createdAt || Date.now())
+          .toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .toLowerCase()}
       </span>
     </div>
   );

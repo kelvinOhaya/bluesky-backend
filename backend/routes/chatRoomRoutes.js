@@ -6,6 +6,7 @@ const authMiddleware = require("../middleware/authMiddleware")
 router.post("/", authMiddleware, chatRoomController.createRoom);
 router.post("/join", authMiddleware, chatRoomController.joinRoom);
 router.post("/verify-join-code", authMiddleware, chatRoomController.verifyJoinCode)
+router.post("/find-user", authMiddleware, chatRoomController.findUser);
 router.post("/load-messages", authMiddleware, chatRoomController.loadMessages)
 router.get("/send-info", authMiddleware, chatRoomController.sendInfo);
 router.put("/change-name", authMiddleware, chatRoomController.changeName);

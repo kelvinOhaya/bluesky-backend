@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import styles from "./ChangeProfilePicture.module.css";
+import styles from "../ChangeProfilePicture/ChangeProfilePicture.module.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { PlusIcon } from "../../../../../general/icons";
 import useAuth from "../../../../../../contexts/auth/useAuth";
@@ -8,11 +8,11 @@ import { useDropzone } from "react-dropzone";
 import api from "../../../../../../utils/api";
 import useSocket from "../../../../../../contexts/socket/useSocket";
 
-function ChangeProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
+function ChangeGroupProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
   const { user, setUser } = useAuth();
-  const { messages, setMessages } = useChatRoom();
+  const { messages, setMessages, currentChat, setCurrentChat } = useChatRoom();
   const { socket } = useSocket();
-  const { isLoading, setIsLoading } = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const fileRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const onDrop = useCallback((acceptedFiles) => {
@@ -24,36 +24,40 @@ function ChangeProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
       )
     );
   }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (preview === null) return;
+    setIsLoading(true);
+    if (!preview || preview.length === 0) return;
     const formData = new FormData(e.target);
     formData.append("image", preview[0]);
+    formData.append("roomId", currentChat._id);
     try {
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-      const { data } = await api.post("/upload/profile-picture", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const { data } = await api.post(
+        "/upload/group-profile-picture",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
-      if (data.foundUser) {
+      if (data.foundChatRoom) {
         // setIsLoading(false);
-        socket.emit("update-profile-picture", user);
+        socket.emit("update-group-profile-picture", data.foundChatRoom);
       }
     } catch (error) {
       if (error && error.response && error.response.data) {
         console.log(
           "Error from the server when trying to upload to cloudinary: ",
-          error.response.data
+          JSON.stringify(error, null, 2)
         );
       }
     } finally {
+      setIsLoading(false);
       setDropdownFeatures({
         ...dropdownFeatures,
-        changeProfilePicture: false,
+        changeGroupProfilePicture: false,
       });
+      setPreview(null);
     }
   };
 
@@ -69,7 +73,7 @@ function ChangeProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
 
   return (
     <AnimatePresence>
-      {dropdownFeatures.changeProfilePicture && (
+      {dropdownFeatures.changeGroupProfilePicture && (
         <motion.form
           className={styles.container}
           initial={{ left: "-400px" }}
@@ -111,4 +115,4 @@ function ChangeProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
   );
 }
 
-export default ChangeProfilePicture;
+export default ChangeGroupProfilePicture;

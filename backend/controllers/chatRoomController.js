@@ -34,7 +34,36 @@ exports.joinRoom = async (req, res) => {
     return res.json({newRoom: foundRoom})
 }
 
+exports.findUser = async (req, res) => {
+    const { joinCode } = req.body
 
+    const foundJoinCode = User.findOne({joinCode})
+
+    if(!foundJoinCode) {
+        return res.status(500).json({error: "User doesn't exist"})
+    }
+
+    const newJoinCode = await utils.generateJoinCode(6)
+
+    const foundUser = await User.findOne({joinCode});
+
+    if (!foundUser) {
+        return res.status(404).json({message: "Error: User not found"})
+    }
+
+    const senderId = req.user.id;
+
+    const newDm = new ChatRoom ({
+        isGroup: true,
+        creator: null,
+        members: [senderId, foundUser._id],
+        joinCode: newJoinCode,
+        profilePicture: null
+    })
+
+    await newDm.save();
+    return res.sendStatus(200)
+}
 
 
 exports.sendInfo = async (req, res) => {
@@ -47,16 +76,24 @@ exports.sendInfo = async (req, res) => {
             User.findById(senderId),
             ChatRoom.find({"members": {$in: [senderId]}}).populate({
                 path: "members",
-                match: {isGroup: true},
-                select: "username profilePicture _id"
-            }),
+                select: "username profilePicture -_id"
+            }).lean(),
         ])
 
+        filteredChatRooms.forEach(room => {
+            if(room.isGroup === true) {
+                room.otherUser = room.members.find((user) => user.username != foundUser.username)
+                if(!room.otherUser) { console.log ("No other user could be found")}
+            }
+            delete room.members;
+        })
 
+        const currentChat = filteredChatRooms.find((room) => (room._id.toString() === foundUser.currentChat.toString()));
+
+        if(!currentChat) { console.log("No current chat found") }
 
         if(filteredChatRooms.length === 0) return res.status(200).json({message: "empty"})
-        const currentChat = await ChatRoom.findById(foundUser.currentChat)
-        return res.status(200).json({chatRooms: filteredChatRooms, currentChat: currentChat})
+        return res.status(200).json({chatRooms: filteredChatRooms, currentChat})
 
     } catch (error) {
         console.log(error);
@@ -124,7 +161,7 @@ exports.leaveRoom = async (req, res) => {
     //find the chat room and if the members array only has one person, delete the room. Else, remove the user's userId from the members array
     try {
         const foundChatRoom = await ChatRoom.findById(currentRoomId);
-        if(foundChatRoom?.members.length <= 1) {
+        if(foundChatRoom?.members.length < 1) {
             await Promise.all([
                 ChatRoom.findByIdAndDelete(currentRoomId),
                 Message.deleteMany({chatRoom: foundChatRoom._id}),
@@ -140,16 +177,5 @@ exports.leaveRoom = async (req, res) => {
         console.log(error)
     }
 
-    //connect the "Leave group" button to the client
 }
 
-/*
-need: chat room Id, userId
-
-find the chat room that has the matching roomId
-
-remove the matching userId in members
-
-if this members is empty afterward, delete the room document
-
-*/

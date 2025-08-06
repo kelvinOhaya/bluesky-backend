@@ -9,7 +9,9 @@ import useAuth from "../../../contexts/auth/useAuth";
 function Display({ className }) {
   const bottomTextMessageRef = useRef(null);
   const { messages } = useChatRoom();
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
+
+  // console.log(accessToken);
 
   useEffect(() => {
     bottomTextMessageRef.current?.scrollIntoView({ behavior: "smooth" });

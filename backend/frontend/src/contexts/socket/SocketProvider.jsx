@@ -6,7 +6,7 @@ function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_BASE_BACKEND_URL);
+    const socket = io(import.meta.env.VITE_L_BASE_BACKEND_URL);
     setSocket(socket);
 
     return () => socket.disconnect();

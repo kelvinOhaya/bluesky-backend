@@ -13,6 +13,7 @@ function ChatRoomProvider({ children }) {
   const [messages, setMessages] = useState(null);
 
   const activateChat = async (element) => {
+    setMessages(null);
     await api.put("/chatroom/update-current-room", {
       currentRoomId: element._id,
     });
@@ -25,7 +26,7 @@ function ChatRoomProvider({ children }) {
   //join a room when a chat is selected
   useEffect(() => {
     if (!currentChat) return;
-
+    console.log(currentChat);
     socket.emit("join-room", currentChat._id);
   }, [currentChat]);
 
@@ -43,7 +44,7 @@ function ChatRoomProvider({ children }) {
           room._id === foundChatRoom._id ? foundChatRoom : room
         )
       );
-      setCurrentChat(foundChatRoom);
+      setCurrentChat({ ...foundChatRoom });
     };
 
     const updateProfilePicture = async (foundUser) => {
@@ -59,15 +60,28 @@ function ChatRoomProvider({ children }) {
       });
     };
 
+    const updateGroupProfilePicture = async (updatedChat) => {
+      console.log("SOCKET EVENT RECIEVED!");
+      setChatRooms((prev) => {
+        return prev.map((room) =>
+          updatedChat._id === room._id ? updatedChat : room
+        );
+      });
+      setCurrentChat(updatedChat);
+      console.log("FINAL RESULTS:\n", currentChat);
+    };
+
     //listeners
     socket.on("receive-message", handleReceiveMessage);
     socket.on("update-room-name", updateCurrentChat);
     socket.on("receive-photo-update", updateProfilePicture);
+    socket.on("receive-group-photo-update", updateGroupProfilePicture);
 
     return () => {
       socket.off("receive-message", handleReceiveMessage);
       socket.off("update-room-name", updateCurrentChat);
       socket.off("receive-photo-update", updateProfilePicture);
+      socket.off("receive-group-photo-update", updateGroupProfilePicture);
     };
   }, [socket]);
 
@@ -76,6 +90,12 @@ function ChatRoomProvider({ children }) {
   const loadChatRooms = async () => {
     try {
       const { data } = await api.get("/chatroom/send-info");
+
+      data.chatRooms.map((chatRoom) => {
+        if (chatRoom.isGroup === true) {
+          console.log(chatRoom);
+        }
+      });
 
       setChatRooms(data.chatRooms);
       setCurrentChat(data.currentChat);
@@ -186,6 +206,13 @@ function ChatRoomProvider({ children }) {
     }
   };
 
+  /**make an api call to the "/chatroom/find-user"**/
+  const findUser = async (joinCode) => {
+    await api.post("/chatroom/find-user", { joinCode });
+    const { data } = await api.get("/chatroom/send-info");
+    setChatRooms(data.chatRooms);
+  };
+
   return (
     <chatRoomContext.Provider
       value={{
@@ -202,6 +229,7 @@ function ChatRoomProvider({ children }) {
         joinRoom,
         activateChat,
         leaveChatRoom,
+        findUser,
         loadChatRooms,
         sendMessage,
         changeName,

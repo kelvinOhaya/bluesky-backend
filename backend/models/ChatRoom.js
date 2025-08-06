@@ -2,14 +2,20 @@ const mongoose = require("mongoose");
 const User = require("./User");
 const { Schema } = mongoose
 
-//redo the rooms
+
 const chatRoomSchema = new Schema({
-    name: {type: String, required: true, default: "Empty ChatRoom"},
+    name: {type: String, default: "Empty ChatRoom"},
     isGroup: {type: Boolean, default: false},
-    creator: {type: Schema.Types.ObjectId, ref: "User", required: true},
+    creator: {type: Schema.Types.ObjectId, ref: "User"},
     members: [{type: Schema.Types.ObjectId, ref: "User"}],
     joinCode: {type: String, required: true},
-    groupPic: {type: String}},
+    profilePicture: {
+        type:  {
+            url: {type: String},
+            public_Id: {type: String}
+        },
+        default: null
+    }},
     {timestamps: true}
 );
 
