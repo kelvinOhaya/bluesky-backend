@@ -1,3 +1,0 @@
-Next Steps:
-
-make it so you can't look for the same user or groupchat twice
