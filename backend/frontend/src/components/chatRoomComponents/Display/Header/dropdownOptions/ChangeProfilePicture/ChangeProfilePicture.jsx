@@ -10,7 +10,7 @@ import useSocket from "../../../../../../contexts/socket/useSocket";
 
 function ChangeProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
   const { user, setUser } = useAuth();
-  const { messages, setMessages } = useChatRoom();
+  const { messages, setMessages, currentChat } = useChatRoom();
   const { socket } = useSocket();
   const { isLoading, setIsLoading } = useState(false);
   const fileRef = useRef(null);
@@ -40,7 +40,10 @@ function ChangeProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
 
       if (data.foundUser) {
         // setIsLoading(false);
-        socket.emit("update-profile-picture", user);
+        socket.emit("update-profile-picture", {
+          user: user,
+          currentRoomId: currentChat._id,
+        });
       }
     } catch (error) {
       if (error && error.response && error.response.data) {
@@ -54,6 +57,7 @@ function ChangeProfilePicture({ dropdownFeatures, setDropdownFeatures }) {
         ...dropdownFeatures,
         changeProfilePicture: false,
       });
+      console.log("Currently, the user is: \n", user);
     }
   };
 

@@ -9,11 +9,6 @@ import AuthContext from "./AuthContext";
 import useChatRoom from "../chatRoom/useChatRoom";
 
 const AuthProvider = ({ children }) => {
-  //   const [isCreator, setIsCreator] = useState(null);
-  // const [chatRooms, setChatRooms] = useState(null);
-  // const [currentChat, setCurrentChat] = useState(null);
-  // const [messages, setMessages] = useState(null);
-
   //the accessToken from the backend, the user data, and checking if the website is loading
   const [accessToken, setAccessToken] = useState(null);
   const [user, setUser] = useState(null);
@@ -102,6 +97,7 @@ const AuthProvider = ({ children }) => {
         accessToken,
         setAccessToken,
         isLoading,
+        setIsLoading,
       }}
     >
       {children}

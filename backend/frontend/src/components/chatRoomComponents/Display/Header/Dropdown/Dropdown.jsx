@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SettingsIcon from "../../../../general/icons/SettingsIcon";
 import styles from "./Dropdown.module.css";
+import useAuth from "../../../../../contexts/auth/useAuth";
 
 const initial = {
   maxHeight: "0px",
@@ -16,6 +17,7 @@ const animate = {
 };
 
 function Dropdown({ isActive, setIsActive, icon, type, children }) {
+  const { user } = useAuth();
   return (
     <div
       onMouseEnter={() => setIsActive({ isActive, [type]: true })}
@@ -25,15 +27,17 @@ function Dropdown({ isActive, setIsActive, icon, type, children }) {
       {icon}
       <AnimatePresence>
         {isActive && (
-          <motion.nav
-            initial={initial}
-            animate={animate}
-            exit={initial}
-            transition={{ duration: "0.4", ease: "easeOut" }}
-            className={styles.navbarContent}
-          >
-            {children}
-          </motion.nav>
+          <>
+            <motion.nav
+              initial={initial}
+              animate={animate}
+              exit={initial}
+              transition={{ duration: "0.4", ease: "easeOut" }}
+              className={styles.navbarContent}
+            >
+              {children}
+            </motion.nav>
+          </>
         )}
       </AnimatePresence>
     </div>

@@ -4,8 +4,9 @@ import useChatRoom from "../../../../../../contexts/chatRoom/useChatRoom";
 import { useEffect, useState } from "react";
 
 function JoinRoom({ dropdownFeatures, setDropdownFeatures }) {
-  const { verifyJoinCode, joinRoom } = useChatRoom();
+  const { verifyJoinCode, joinRoom, checkIfRoomExists } = useChatRoom();
   const [roomDoesNotExist, setRoomDoesNotExist] = useState(false);
+  const [roomAlreadyExists, setRoomAlreadyExists] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
   const [joinCode, setJoinCode] = useState("");
@@ -21,10 +22,18 @@ function JoinRoom({ dropdownFeatures, setDropdownFeatures }) {
     setIsSearching(true);
     setIsEmpty(false);
     setRoomDoesNotExist(false);
+    setRoomAlreadyExists(false);
 
     if (joinCode.trim() === "") {
       setIsSearching(false);
       setIsEmpty(true);
+      return;
+    }
+
+    const roomAlreadyExists = checkIfRoomExists(joinCode);
+    if (roomAlreadyExists) {
+      setIsSearching(false);
+      setRoomAlreadyExists(true);
       return;
     }
 
@@ -53,7 +62,7 @@ function JoinRoom({ dropdownFeatures, setDropdownFeatures }) {
               <input
                 type="text"
                 name="searchBar"
-                placeholder="Type Room or User ID: "
+                placeholder="Type Join Code Here: "
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value)}
                 className={styles.inputField}
@@ -61,6 +70,9 @@ function JoinRoom({ dropdownFeatures, setDropdownFeatures }) {
               {isSearching && <p>Searching...</p>}
               {roomDoesNotExist && (
                 <p>*A room does not exist with that join code</p>
+              )}
+              {roomAlreadyExists && (
+                <p>*You are already in a room with that joinCode</p>
               )}
               {isEmpty && <p>*Please enter a join code</p>}
             </span>

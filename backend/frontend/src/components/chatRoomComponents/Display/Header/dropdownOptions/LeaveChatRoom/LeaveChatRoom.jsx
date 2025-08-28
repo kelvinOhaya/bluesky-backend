@@ -3,7 +3,7 @@ import styles from "./LeaveChatRoom.module.css";
 import { motion, AnimatePresence } from "framer-motion";
 
 function LeaveChatRoom({ dropdownFeatures, setDropdownFeatures }) {
-  const { leaveChatRoom } = useChatRoom();
+  const { leaveChatRoom, currentChat } = useChatRoom();
 
   const handleLeaveRoom = async () => {
     await leaveChatRoom();
@@ -20,7 +20,15 @@ function LeaveChatRoom({ dropdownFeatures, setDropdownFeatures }) {
           transition={{ duration: "0.3" }}
           className={styles.container}
         >
-          <p>Are you sure you want to leave?</p>
+          <p style={{ textAlign: "center" }}>
+            {currentChat.isDm
+              ? "Are you sure you want to leave this chat?"
+              : "Are you sure you want to leave?"}
+          </p>
+          <p style={{ textAlign: "center" }}>
+            {currentChat.memberCount === 1 &&
+              "You are the last member. All messages will be lost forever!"}
+          </p>
           <div className={styles.buttonContainer}>
             <button
               onClick={() =>

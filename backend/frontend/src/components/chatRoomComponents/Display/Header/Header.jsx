@@ -30,13 +30,12 @@ import {
   FindUser,
 } from "./dropdownOptions";
 
-// Context
 import useChatRoom from "../../../../contexts/chatRoom/useChatRoom";
 import useAuth from "../../../../contexts/auth/useAuth";
 
 function Header({ className }) {
-  const { currentChat, isCreator, leaveChatRoom } = useChatRoom();
   const { user } = useAuth();
+  const { currentChat } = useChatRoom();
   const [isActive, setIsActive] = useState({
     settings: false,
     groupOptions: false,
@@ -74,24 +73,27 @@ function Header({ className }) {
             <UserLabel
               className={styles.userLabel}
               name={
-                currentChat?.isGroup === true
+                currentChat?.isDm === true
                   ? currentChat.otherUser?.username ?? "Loading..."
                   : currentChat.name
               }
               imgSize={37}
               src={
-                currentChat.isGroup
-                  ? currentChat.otherUser.profilePicture?.url || null
-                  : currentChat.profilePicture?.url
-                  ? currentChat.profilePicture.url
-                  : null
+                currentChat.isDm
+                  ? currentChat.otherUser?.profilePicture?.url || null
+                  : currentChat.profilePicture?.url || null
               }
             />
-            {!currentChat.isGroup && (
+            <p className={styles.memberCount}>
+              Members: {currentChat.memberCount}
+            </p>
+
+            {!currentChat.isDm && (
               <span className={styles.joinCode}>
                 Join Code: {currentChat?.joinCode || "999999"}
               </span>
             )}
+
             <Dropdown
               isActive={isActive.groupOptions}
               type={"groupOptions"}
@@ -104,7 +106,7 @@ function Header({ className }) {
                 />
               }
             >
-              {isCreator && (
+              {currentChat.isDm === false && (
                 <>
                   <Option
                     className={styles.option}
@@ -133,7 +135,7 @@ function Header({ className }) {
               <Option
                 className={styles.option}
                 icon={LeaveIcon}
-                label={"Leave Group"}
+                label={currentChat.isDm ? "Leave Chat" : "Leave Group"}
                 onClick={() =>
                   setDropdownFeatures({
                     dropdownFeatures,
@@ -157,6 +159,9 @@ function Header({ className }) {
             />
           }
         >
+          <span className={styles.personalJoinCode}>
+            Personal Join Code: {user.joinCode}
+          </span>
           <Option
             className={styles.option}
             icon={PencilIcon}

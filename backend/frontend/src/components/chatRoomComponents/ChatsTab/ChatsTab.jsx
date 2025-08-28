@@ -45,13 +45,13 @@ function ChatsTab({ className }) {
                   <UserLabel
                     className={styles.userLabel}
                     name={
-                      chatRoom.isGroup
+                      chatRoom.isDm
                         ? chatRoom.otherUser?.username
                         : chatRoom.name
                     }
                     src={
-                      chatRoom.isGroup
-                        ? chatRoom.otherUser.profilePicture?.url || null
+                      chatRoom.isDm
+                        ? chatRoom.otherUser?.profilePicture?.url || null
                         : chatRoom.profilePicture?.url
                         ? chatRoom.profilePicture.url
                         : null

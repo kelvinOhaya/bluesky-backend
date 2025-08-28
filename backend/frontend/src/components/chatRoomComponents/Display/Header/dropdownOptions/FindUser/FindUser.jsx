@@ -2,10 +2,16 @@ import styles from "./FindUser.module.css";
 import { motion, AnimatePresence } from "framer-motion";
 import useChatRoom from "../../../../../../contexts/chatRoom/useChatRoom";
 import { useEffect, useState } from "react";
+import useSocket from "../../../../../../contexts/socket/useSocket";
+import useAuth from "../../../../../../contexts/auth/useAuth";
 
 function FindUser({ dropdownFeatures, setDropdownFeatures }) {
-  const { verifyJoinCode, findUser } = useChatRoom();
+  const { verifyJoinCode, findUser, currentChat, checkIfDmExists } =
+    useChatRoom();
+  const { user } = useAuth();
+  const { socket } = useSocket();
   const [userDoesNotExist, setUserDoesNotExist] = useState(false);
+  const [alreadyInDm, setAlreadyInDm] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
   const [joinCode, setJoinCode] = useState("");
@@ -13,14 +19,13 @@ function FindUser({ dropdownFeatures, setDropdownFeatures }) {
   useEffect(() => {
     setIsEmpty(false);
     setUserDoesNotExist(false);
+    setAlreadyInDm(false);
     setJoinCode("");
   }, [dropdownFeatures]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
     setIsSearching(true);
-    setIsEmpty(false);
-    setUserDoesNotExist(false);
 
     if (joinCode.trim() === "") {
       setIsSearching(false);
@@ -28,9 +33,18 @@ function FindUser({ dropdownFeatures, setDropdownFeatures }) {
       return;
     }
 
+    const dmExists = checkIfDmExists(joinCode);
+    console.log(dmExists);
+    if (dmExists) {
+      setIsSearching(false);
+      setAlreadyInDm(true);
+      return;
+    }
+
+    // vFrOqPjN
     try {
-      setIsSearching(true);
       await findUser(joinCode);
+
       setDropdownFeatures({ dropdownFeatures, userSearch: false });
     } catch (error) {
       setUserDoesNotExist(true);
@@ -63,6 +77,7 @@ function FindUser({ dropdownFeatures, setDropdownFeatures }) {
               {userDoesNotExist && (
                 <p>*A User does not exist with that join code</p>
               )}
+              {alreadyInDm && <p>*You already have a room with this user</p>}
               {isEmpty && <p>*Please enter a join code</p>}
             </span>
             <button type="submit" className={styles.submitBtn}>
