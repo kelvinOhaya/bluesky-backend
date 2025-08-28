@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 require("dotenv").config();
 const { Server } = require("socket.io");
-const port = 5000;
+const port = process.env.PORT || 5000;
 const path = require("path");
 const { init } = require("./io");
 const initSocket = require("./sockets/chatSocket");
