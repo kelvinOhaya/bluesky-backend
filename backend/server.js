@@ -45,6 +45,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/chatroom", chatRoomRoutes);
 app.use("/api/upload", uploadRoutes);
 
+// Static files after
+app.use(express.static(path.join(__dirname, "frontend/dist")));
+
+// Fallback for SPA
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend/dist", "index.html"));
+});
+
 //listen on this port, and do the following function once listening.
 server.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
