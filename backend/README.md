@@ -1,6 +1,6 @@
 # Solo-Chat-App Backend
 
-This is the backend for the Solo-Chat-App, a real-time chat application with group and direct messaging, built with Node.js, Express, MongoDB, and Socket.IO.
+This is the backend for the BlueSky, a real-time chat application with group and direct messaging, built with Node.js, Express, MongoDB, and Socket.IO.
 
 ## Features
 
