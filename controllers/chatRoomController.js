@@ -6,6 +6,7 @@ const JoinCode = require("../models/JoinCode");
 const Message = require("../models/Message");
 const OnlineId = require("../models/OnlineId");
 const { getIo } = require("../io");
+const { ObjectId } = require("mongodb");
 // const Message = require("../models/Message");
 
 exports.createRoom = async (req, res) => {
@@ -130,22 +131,52 @@ exports.findUser = async (req, res) => {
 
 exports.sendInfo = async (req, res) => {
   const senderId = req.user.id;
-  console.log(`IO constructor name: ${getIo().constructor.name}`);
+  // console.log(`IO constructor name: ${getIo().constructor.name}`);
 
   //find all chat rooms where the user's Id is in there
   try {
     const [foundUser, filteredChatRooms] = await Promise.all([
       User.findById(senderId),
-      ChatRoom.find({ members: { $in: [senderId] } })
-        .populate({
-          path: "members",
-          select: "username profilePicture joinCode",
-        })
-        .populate({
-          path: "exMembers",
-          select: "username profilePicture -_id",
-        })
-        .lean(),
+
+      ChatRoom.aggregate([
+        {
+          $match: {
+            members: new ObjectId(senderId),
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            let: { memberId: "$members" },
+            pipeline: [
+              { $match: { $expr: { $in: ["$_id", "$$memberId"] } } },
+              { $project: { username: 1, profilePicture: 1, joinCode: 1 } },
+            ],
+            as: "members",
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            let: { exMemberIds: "$exMembers" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $cond: [
+                      { $gt: [{ $size: "$$exMemberIds" }, 0] },
+                      { $in: ["$_id", "$$exMemberIds"] },
+                      false,
+                    ],
+                  },
+                },
+              },
+              { $project: { username: 1, profilePicture: 1 } },
+            ],
+            as: "exMembers",
+          },
+        },
+      ]),
     ]);
 
     filteredChatRooms.forEach((room) => {
