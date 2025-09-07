@@ -6,11 +6,9 @@ const OnlineId = require("../models/OnlineId");
 function initSocket(io) {
   io.use((socket, next) => {
     const userId = socket.handshake.auth.userId;
-
     if (!userId) {
-      console.log("No Id found");
+      return next(new Error("Authentication error"));
     }
-
     socket.userId = userId;
     next();
   });
@@ -18,25 +16,46 @@ function initSocket(io) {
   io.on("connection", async (socket) => {
     console.log(`User ${socket.userId} has connected`);
 
-    const alreadyOnline = await OnlineId.exists({ userId: socket.userId });
+    try {
+      // Update or create online status
+      await OnlineId.findOneAndUpdate(
+        { userId: socket.userId },
+        { socketId: socket.id },
+        { upsert: true, new: true }
+      );
 
-    if (!alreadyOnline) {
-      await OnlineId.create({
-        userId: socket.userId,
-        socketId: socket.id,
+      // Rejoin rooms on reconnection
+      const userRooms = await ChatRoom.find({
+        members: socket.userId,
+      }).select("_id");
+
+      userRooms.forEach((room) => {
+        socket.join(room._id.toString());
+        console.log(`User ${socket.userId} rejoined room ${room._id}`);
       });
+    } catch (error) {
+      console.error("Error handling connection:", error);
     }
 
-    //shows that a user has entered a room with their id (debugging)
-    socket.on("join-room", (data) => {
-      console.log(data);
-      socket.leave(data.prevRoom);
-      socket.join(data.newRoom);
+    socket.on("join-room", async (data) => {
+      try {
+        if (data.prevRoom) {
+          await socket.leave(data.prevRoom);
+        }
+        await socket.join(data.newRoom);
 
-      console.log("User has joined");
+        // Notify room members
+        io.to(data.newRoom).emit("user-joined", {
+          userId: socket.userId,
+          roomId: data.newRoom,
+        });
+
+        console.log(`User ${socket.userId} joined room ${data.newRoom}`);
+      } catch (error) {
+        console.error("Error joining room:", error);
+      }
     });
 
-    //for sending messages to everyone in the room
     socket.on("send-message", async (message) => {
       console.log(message);
       const newMessage = new Message({
@@ -71,16 +90,25 @@ function initSocket(io) {
     });
 
     socket.on("leave-room", async (data) => {
-      console.log("Leave room event triggered");
-      const foundRoom = await ChatRoom.findById(data.currentRoomId);
-      if (foundRoom) {
-        console.log("LEAVE ROOM EVENT found the following room:,\n", foundRoom);
-        const newMemberCount = foundRoom.members.length;
-        socket.leave(data.currentRoomId);
-        io.to(data.currentRoomId).emit("update-member-count", {
-          roomId: data.currentRoomId,
-          newMemberCount,
-        });
+      try {
+        const foundRoom = await ChatRoom.findById(data.currentRoomId);
+        if (foundRoom) {
+          await socket.leave(data.currentRoomId);
+
+          // Update member count
+          const newMemberCount = foundRoom.members.length;
+
+          // Notify remaining room members
+          io.to(data.currentRoomId).emit("update-member-count", {
+            roomId: data.currentRoomId,
+            newMemberCount,
+            userId: socket.userId,
+          });
+
+          console.log(`User ${socket.userId} left room ${data.currentRoomId}`);
+        }
+      } catch (error) {
+        console.error("Error leaving room:", error);
       }
     });
 
@@ -158,8 +186,12 @@ function initSocket(io) {
     });
 
     socket.on("disconnect", async () => {
-      await OnlineId.findOneAndDelete({ userId: socket.userId });
-      console.log("Successfully Disconnected!");
+      try {
+        await OnlineId.findOneAndDelete({ userId: socket.userId });
+        console.log(`User ${socket.userId} disconnected`);
+      } catch (error) {
+        console.error("Error handling disconnect:", error);
+      }
     });
   });
 }
