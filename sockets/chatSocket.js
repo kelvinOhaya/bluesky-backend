@@ -89,24 +89,12 @@ function initSocket(io) {
       io.to(currentChat._id).emit("receive-group-photo-update", currentChat);
     });
 
-    socket.on("leave-room", async (data) => {
+    //leave the socket chat room
+    socket.on("leave-room", (data) => {
       try {
-        const foundRoom = await ChatRoom.findById(data.currentRoomId);
-        if (foundRoom) {
-          await socket.leave(data.currentRoomId);
-
-          // Update member count
-          const newMemberCount = foundRoom.members.length;
-
-          // Notify remaining room members
-          io.to(data.currentRoomId).emit("update-member-count", {
-            roomId: data.currentRoomId,
-            newMemberCount,
-            userId: socket.userId,
-          });
-
-          console.log(`User ${socket.userId} left room ${data.currentRoomId}`);
-        }
+        const { currentRoomId } = data;
+        socket.leave(currentRoomId);
+        console.log(`User ${socket.userId} left room ${currentRoomId}`);
       } catch (error) {
         console.error("Error leaving room:", error);
       }
@@ -167,22 +155,6 @@ function initSocket(io) {
       io.to(data.currentRoomId).emit("increase-member-count-client", {
         roomId: data.currentRoomId,
       });
-    });
-
-    socket.on("leave-room", async (data) => {
-      const { currentRoomId } = data;
-
-      const foundRoom = await ChatRoom.findById(currentRoomId).lean();
-
-      const onlineMembers = await OnlineId.find({
-        userId: { $in: foundRoom.members },
-      }).lean();
-
-      onlineMembers.forEach((onlineUser) => {
-        io.to(onlineUser.socketId).emit("user-left", { currentRoomId });
-      });
-
-      //event wil be called user-left
     });
 
     socket.on("disconnect", async () => {
