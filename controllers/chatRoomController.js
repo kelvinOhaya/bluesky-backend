@@ -36,39 +36,108 @@ exports.joinRoom = async (req, res) => {
 
   //look for a room, and if one is not found, send error to client
   const foundRoom = await ChatRoom.findOneAndUpdate(
-    { joinCode },
-    { $addToSet: { members: senderId } },
-    { new: true }
+    { joinCode }, //find the field based on the joinCode
+    { $addToSet: { members: senderId } }, //add the senderId to members[]
+    { new: true } //return the updated document
   ).lean();
+
   if (!foundRoom) {
     res.status(400).json({ error: "incorrect join code" });
   }
-  foundRoom.memberCount = foundRoom.members.length;
-  console.log(foundRoom);
 
-  return res.json({ newRoom: foundRoom });
+  foundRoom.memberCount = foundRoom.members.length;
+  console.log(
+    `We found the following room when joining a group chat: \n${JSON.stringify(
+      foundRoom
+    )}`
+  );
+
+  //find all onlineIds that are in the member's array fo foundRoom's members
+  const foundOnlineIds = await OnlineId.find({
+    //since you used .lean()the members need to be converted back to Ids from strings
+    userId: {
+      $in: foundRoom.members.map((memberId) => new ObjectId(memberId)),
+    },
+  });
+
+  if (foundOnlineIds.length > 0) {
+    foundOnlineIds.map((id, ind) => console.log(`Id ${ind}: ${id}\n`));
+    //increase the member count of each of them by one
+    foundOnlineIds.forEach((id) => {
+      getIo().to(id.socketId).emit("increase-member-count", {
+        updatedRoomId: foundRoom._id,
+      });
+    });
+  } else {
+    console.log("No online IDs were found");
+  }
+
+  //send this new room to the client
+  return res.status(200).json({ newRoom: foundRoom });
 };
 
-//check for exmembers
+//For making new DMs
 exports.findUser = async (req, res) => {
   let { joinCode } = req.body;
   joinCode = joinCode.trim();
-  const senderId = req.user.id;
+  const senderId = new ObjectId(req.user.id);
+  let roomToUpdate = null;
 
-  const foundUser = await User.findOne({ joinCode });
-
+  //look for the other user. If they don't exist, return an error
+  const foundUser = await User.exists({ joinCode });
   if (!foundUser) {
     return res.status(404).json({ message: "Error: User not found" });
   }
 
-  const dmAlreadyExists = await ChatRoom.exists({
-    exMembers: { $in: [senderId] },
-    members: { $in: [foundUser._id] },
-    idDm: true,
-  });
+  //debug message to ensure foundUser exists
+  //console.log(`The following User ID was found: ${JSON.stringify(foundUser)}`);
 
-  if (dmAlreadyExists) {
-    const foundRoom = await ChatRoom.findOneAndUpdate(
+  //look for the user's corresponding onlineID. If it doesn't exist, return an error
+  const foundOnlineId = await OnlineId.findOne({ userId: foundUser._id });
+
+  //debug message to ensure OnlineId exists
+  //console.log(`The following online ID was found: ${foundOnlineId}`);
+
+  //extracted aggregation logic for finding and populating fields with otherUser
+  const getDmPipeline = (senderId, matchStage) => [
+    { $match: matchStage },
+    {
+      $lookup: {
+        from: "users",
+        let: { memberIds: "$members" },
+        pipeline: [
+          { $match: { $expr: { $in: ["$_id", "$$memberIds"] } } },
+          { $project: { username: 1, profilePicture: 1, joinCode: 1 } },
+        ],
+        as: "members",
+      },
+    },
+    {
+      $addFields: {
+        otherUser: {
+          $arrayElemAt: [
+            {
+              $filter: {
+                input: "$members",
+                as: "member",
+                cond: { $ne: ["$$member._id", senderId] },
+                limit: 1,
+              },
+            },
+            0,
+          ],
+        },
+        memberCount: { $size: "$members" },
+      },
+    },
+    { $unset: "exMembers" },
+  ];
+
+  //aggregation for the foundRoom Document
+
+  //update the room first, but if that doesnt work return an error
+  try {
+    roomToUpdate = await ChatRoom.updateOne(
       {
         isDm: true,
         $or: [
@@ -81,21 +150,57 @@ exports.findUser = async (req, res) => {
         $pull: { exMembers: senderId },
         $addToSet: { members: senderId },
       }
-    ).populate({ path: "members", select: "username profilePicture joinCode" });
-    const clientRoom = foundRoom.toObject();
-    await foundRoom.save();
-
-    clientRoom.otherUser = clientRoom.members.find(
-      (user) => user.username === foundUser.username //in this case, the found user is actually the other user
     );
-    clientRoom.memberCount = 2;
-    delete clientRoom.members;
+  } catch (error) {
+    roomToUpdate = null;
+  }
 
-    console.log("AAAAA\n", clientRoom);
+  console.log(`Updated room results:\n ${JSON.stringify(roomToUpdate)}`);
+
+  //if such a room exists, update that room
+  if (roomToUpdate.modifiedCount > 0) {
+    const foundRoom = await ChatRoom.aggregate(
+      getDmPipeline(senderId, {
+        isDm: true,
+        $or: [
+          //check if any of these are true
+          { members: { $all: [senderId, foundUser._id] } }, //both user's ids are in members[]
+          //the sender's id is in members[], and the other person's id is in exMembers[]
+          {
+            $and: [
+              //senderId needs to be converted to ab objectId because right now its just a string
+              { members: { $in: [senderId] } }, //check to see if senderId is in the members array
+              { exMembers: { $in: [foundUser._id] } }, //follows ^this logic
+            ],
+          },
+          //the other person's id is in members[], and the sender's id is in exMembers[]
+          {
+            $and: [
+              { members: { $in: [foundUser._id] } },
+              { exMembers: { $in: [senderId] } },
+            ],
+          },
+        ],
+      })
+    );
+
+    console.log("Here is the found room:\n", foundRoom); //check if the client room exists or not
+
+    //SEND SOCKET EVENT TO INCREASE MEMBER COUNT AS WELL (only if onlineId is found, otherwise the other person isn't online, so there's no point)
+    if (foundOnlineId) {
+      // console.log(`We found the following ID: \n${foundOnlineId}`); //check if the onlineId exists
+      console.log(`foundRoom._id: ${foundRoom[0]._id}`);
+      getIo()
+        .to(foundOnlineId.socketId)
+        .emit("increase-member-count", { updatedRoomId: foundRoom[0]._id }); //make this a new event called "increase-member-count" for clarity
+    }
+
+    //send the new room and the id of the other user to the client
     return res
       .status(200)
-      .json({ otherUserId: foundUser._id, newRoom: clientRoom });
+      .json({ otherUserId: foundUser._id, newRoom: foundRoom[0] });
   } else {
+    //if the foundRoom doesn't exist, make a new one and save it to mongodb
     const newJoinCode = await utils.generateJoinCode(6);
     const newDm = new ChatRoom({
       isDm: true,
@@ -106,26 +211,40 @@ exports.findUser = async (req, res) => {
     });
 
     await newDm.save();
-    //optomize with promise.all soon
-    const foundOnlineId = await OnlineId.findOne({ userId: foundUser._id });
 
-    const foundDm = await ChatRoom.findOne({ joinCode: newJoinCode })
-      .populate({ path: "members", select: "username profilePicture joinCode" })
-      .lean();
-
-    foundDm.otherUser = foundDm.members.find(
-      (user) => user.username === foundUser.username
+    //find the chat room that was just created
+    const foundDm = await ChatRoom.aggregate(
+      getDmPipeline(
+        senderId,
+        { joinCode: newJoinCode } //find the room with the matching joincode)
+      )
     );
-    foundDm.memberCount = foundDm.members.length;
-    delete foundDm.members;
 
-    getIo()
-      .to(foundOnlineId.socketId)
-      .emit("update-chat-client", { updatedRoom: foundDm });
+    // console.log(`Found the following DM: ${foundDm}`); //--check if the dm exists
 
+    //make an altered version for the other user where the sender is the otherUser
+    const alteredFoundDm = {
+      ...foundDm[0],
+      otherUser: foundDm[0].members.find(
+        (member) => member._id.toString() === senderId.toString()
+      ),
+    };
+
+    console.log(
+      `Here's your altered DM: ${JSON.stringify(alteredFoundDm, null, 2)}`
+    ); //--shows the altered DM
+
+    //send the socketEvent "add-room"
+    if (foundOnlineId) {
+      getIo()
+        .to(foundOnlineId.socketId)
+        .emit("add-room", { updatedRoom: alteredFoundDm });
+    }
+
+    //send status 200 with the otherUserId and the new room
     return res
       .status(200)
-      .json({ otherUserId: foundUser._id, newRoom: foundDm });
+      .json({ otherUserId: foundUser._id, newRoom: foundDm[0] });
   }
 };
 
@@ -277,49 +396,52 @@ exports.leaveRoom = async (req, res) => {
   const { currentRoomId } = req.body;
   console.log(`Current Room Id: ${currentRoomId}`);
 
-  //find the chat room and if the members array only has one person, delete the room. Else, remove the user's userId from the members array
   try {
+    //find the chatroom to delete by id
     const foundChatRoom = await ChatRoom.findById(currentRoomId);
     if (!foundChatRoom) {
       return res.status(404).json({ error: "Chat room not found" });
     }
-    if (!Array.isArray(foundChatRoom.members)) {
-      foundChatRoom.members = [];
-    }
-    const memberCount = foundChatRoom.members.length;
+    // if (!Array.isArray(foundChatRoom.members)) {
+    //   foundChatRoom.members = [];
+    // }
 
-    if (memberCount === 1) {
+    //if there is only one member at the time of the leave request, delete the room and its corresponding messages entirely
+    if (foundChatRoom.members.length === 1) {
       await Promise.all([
         ChatRoom.findByIdAndDelete(currentRoomId),
         Message.deleteMany({ chatRoom: foundChatRoom._id }),
       ]);
     } else {
       await Promise.all([
-        ChatRoom.findOneAndUpdate(
+        //remove the id from members, and add it to exMembers
+        ChatRoom.updateOne(
           { _id: currentRoomId },
           { $pull: { members: senderId }, $addToSet: { exMembers: senderId } }
         ),
-        User.findOneAndUpdate(
-          { _id: senderId },
-          { $set: { currentChat: null } }
-        ),
+        //set the currentChat to null
+        User.updateOne({ _id: senderId }, { $set: { currentChat: null } }),
       ]);
       console.log("Successfully removed!");
 
-      // Re-fetch the updated room for emitting to clients
-      const updatedRoom = await ChatRoom.findById(currentRoomId).lean();
-      if (updatedRoom) {
-        updatedRoom.memberCount = updatedRoom.members
-          ? updatedRoom.members.length
-          : 0;
-        delete updatedRoom.members;
-        getIo()
-          .to(currentRoomId)
-          .emit("update-chat-room-client", { updatedRoom });
-      }
+      //question: how do we find all the socketIds of the people who are online AND in the room the user just left?
+      //idea: find all the onlineIds and filter them down to the ones that are in the members array of the chatRoom
+      const foundOnlineIds = await OnlineId.find({
+        userId: {
+          $in: foundChatRoom.members.filter((id) => id.toString() !== senderId),
+        }, //check if userId is in foundChatRoom.members array
+      });
 
-      return res.json({ success: true });
+      if (foundOnlineIds) {
+        foundOnlineIds.forEach((onlineId) => {
+          getIo()
+            .to(onlineId.socketId)
+            .emit("decrease-member-count", { roomId: currentRoomId });
+        });
+      }
     }
+
+    return res.json({ success: true });
   } catch (error) {
     console.log(error);
     return res
