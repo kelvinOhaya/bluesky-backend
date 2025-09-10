@@ -359,14 +359,31 @@ exports.changeName = async (req, res) => {
   const { newName, currentRoomId } = req.body;
 
   try {
-    const foundChatRoom = await ChatRoom.findById(currentRoomId);
+    const foundChatRoom = await ChatRoom.findOneAndUpdate(
+      {
+        _id: currentRoomId,
+      },
+      { $set: { name: newName } },
+      { new: true }
+    ).select("members");
 
-    foundChatRoom.name = newName;
-    const clientChatRoom = foundChatRoom.toObject();
-    await foundChatRoom.save();
+    console.log(`Update results: \n${JSON.stringify(foundChatRoom, null, 2)}`);
 
-    clientChatRoom.memberCount = clientChatRoom.members.length;
-    return res.json({ foundChatRoom: clientChatRoom });
+    const foundOnlineIds = await OnlineId.find({
+      userId: { $in: foundChatRoom.members },
+    });
+
+    console.log(
+      `All reported onlineIds:\n ${JSON.stringify(foundOnlineIds, null, 2)}`
+    );
+
+    foundOnlineIds.forEach((onlineId) => {
+      getIo()
+        .to(onlineId.socketId)
+        .emit("update-room-name", { roomId: currentRoomId, newName });
+    });
+
+    return res.json({ foundChatRoom });
   } catch (error) {
     console.log("Error in the changeName function: ", error);
   }
