@@ -383,7 +383,7 @@ exports.changeName = async (req, res) => {
         .emit("update-room-name", { roomId: currentRoomId, newName });
     });
 
-    return res.json({ foundChatRoom });
+    res.sendStatus(200);
   } catch (error) {
     console.log("Error in the changeName function: ", error);
   }
