@@ -22,7 +22,7 @@ exports.updateProfilePicture = async (req, res) => {
 
     //get all possible ids where other users might need to get this socket event (duplicates are expected)
     const possibleMembers = await ChatRoom.find({
-      members: senderId,
+      $or: [{ members: senderId }, { exMembers: senderId }],
     }).select("members");
 
     //make new array a set to remove duplicates
