@@ -32,7 +32,7 @@ exports.updateProfilePicture = async (req, res) => {
       ...new Set(possibleMembers.flatMap((room) => room.members)),
     ];
 
-    res.sendStatus(200);
+    res.status(200).json({ newProfilePicture });
 
     await Promise.all([
       User.findByIdAndUpdate(req.user.id, {
