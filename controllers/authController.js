@@ -1,6 +1,9 @@
+const ChatRoom = require("../models/ChatRoom");
 const User = require("../models/User"); //import the user model
 const { createAccessToken, createRefreshToken } = require("../utils/jwt"); //import the functions for making access and refresh tokens
 const { generateJoinCode } = require("../utils/utils");
+const { ObjectId } = require("mongodb");
+require("dotenv").config();
 
 //controller for verifying the sign up input
 exports.verifySignUp = async (req, res) => {
@@ -33,6 +36,7 @@ exports.signUp = async (req, res) => {
   //make a new user with the request from the user
   const newUser = new User({
     username, // <- a shortcut that means "username: username"
+    currentChat: new ObjectId(process.env.WELCOME_ROOM_ID),
     password,
     joinCode, // same as the line above
   });
@@ -49,6 +53,11 @@ exports.signUp = async (req, res) => {
     sameSite: "None",
     secure: true,
     path: "/",
+  });
+
+  const foundUser = await User.findOne({ username }).select("");
+  await ChatRoom.findByIdAndUpdate("68c0671711b70a88b9b0cd90", {
+    $addToSet: { members: foundUser._id },
   });
 
   //send the access token to the client
