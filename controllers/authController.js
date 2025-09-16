@@ -36,7 +36,7 @@ exports.signUp = async (req, res) => {
   //make a new user with the request from the user
   const newUser = new User({
     username, // <- a shortcut that means "username: username"
-    currentChat: new ObjectId(process.env.WELCOME_ROOM_ID),
+    currentChat: new ObjectId("68c0671711b70a88b9b0cd90"),
     password,
     joinCode, // same as the line above
   });
