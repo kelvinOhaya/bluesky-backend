@@ -50,7 +50,7 @@ exports.signUp = async (req, res) => {
   //store refresh token in secure http cookie
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: "none",
+    sameSite: "None",
     secure: true,
     path: "/",
   });
@@ -85,7 +85,7 @@ exports.login = async (req, res) => {
   //store refresh token in secure http cookie
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: "none",
+    sameSite: "None",
     secure: true,
     path: "/",
   });
