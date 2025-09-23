@@ -37,10 +37,11 @@ app.use(
     credentials: true, //allows us to use cookies in our requests
     origin: allowedOrigins,
     //allow the frontend to make requests to this server
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
+app.options("*", cors());
 //initialize socketio's logic
 
 //mount all the routers
