@@ -52,6 +52,7 @@ exports.signUp = async (req, res) => {
     httpOnly: true,
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     secure: process.env.NODE_ENV === "production",
+    domain: undefined,
     path: "/",
   });
 
@@ -104,6 +105,7 @@ exports.login = async (req, res) => {
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       secure: process.env.NODE_ENV === "production",
+      domain: undefined,
       path: "/",
     });
     console.log("11. Cookie set");
