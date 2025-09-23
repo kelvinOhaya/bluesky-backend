@@ -50,8 +50,8 @@ exports.signUp = async (req, res) => {
   //store refresh token in secure http cookie
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: "None",
-    secure: true,
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    secure: process.env.NODE_ENV === "production",
     path: "/",
   });
 
@@ -85,8 +85,8 @@ exports.login = async (req, res) => {
   //store refresh token in secure http cookie
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: "None",
-    secure: true,
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    secure: process.env.NODE_ENV === "production",
     path: "/",
   });
 
