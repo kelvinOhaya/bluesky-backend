@@ -125,7 +125,7 @@ exports.logout = (req, res) => {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
-      sameSite: "none",
+      sameSite: "None",
       path: "/",
     });
     return res.sendStatus(204);
