@@ -111,6 +111,10 @@ exports.login = async (req, res) => {
     //send the access token to the client
     console.log("12. Sending response...");
     console.log("=== LOGIN END ===");
+
+    // result headers
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Content-Type", "application/json");
     return res.status(200).json({ accessToken });
   } catch (error) {
     console.error("LOGIN ERROR:", error);
