@@ -67,6 +67,7 @@ exports.signUp = async (req, res) => {
 //login logic
 exports.login = async (req, res) => {
   const { username, password } = req.body;
+  console.log("data received");
 
   //check if the user exists and the password matches
   //if not, send an 401 error with the following error message
@@ -111,6 +112,7 @@ exports.refreshToken = (req, res) => {
       return res.sendStatus(403);
     }
     const accessToken = createAccessToken({ _id: user.id });
+    console.log("Login finished!");
     res.json({ accessToken });
   });
 };
