@@ -66,33 +66,56 @@ exports.signUp = async (req, res) => {
 
 //login logic
 exports.login = async (req, res) => {
+  console.log("=== LOGIN START ===");
   const { username, password } = req.body;
-  console.log("data received");
+  console.log("Received data:", { username, passwordLength: password?.length });
 
-  //check if the user exists and the password matches
-  //if not, send an 401 error with the following error message
-  const foundUser = await User.findOne({ username });
-  if (!foundUser) return res.status(401).json({ error: "invalid credentials" });
+  try {
+    //check if the user exists and the password matches
+    console.log("1. Looking for user...");
+    const foundUser = await User.findOne({ username });
+    console.log("2. User found:", !!foundUser);
 
-  //check if the password entered matches with the password in the database
-  //if not, send a 401 error with the following error message
-  const match = await foundUser.matchPassword(password);
-  if (!match) return res.status(401).json({ error: "invalid credentials" });
+    if (!foundUser) {
+      console.log("3. User not found, returning 401");
+      return res.status(401).json({ error: "invalid credentials" });
+    }
 
-  //grant access and refresh tokens (check jwt.js for details)
-  const accessToken = createAccessToken(foundUser);
-  const refreshToken = createRefreshToken(foundUser);
+    //check if the password entered matches with the password in the database
+    console.log("4. Checking password...");
+    const match = await foundUser.matchPassword(password);
+    console.log("5. Password match:", match);
 
-  //store refresh token in secure http cookie
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-  });
+    if (!match) {
+      console.log("6. Password mismatch, returning 401");
+      return res.status(401).json({ error: "invalid credentials" });
+    }
 
-  //send the access token to the client
-  return res.status(200).json({ accessToken });
+    //grant access and refresh tokens (check jwt.js for details)
+    console.log("7. Creating tokens...");
+    const accessToken = createAccessToken(foundUser);
+    console.log("8. Access token created");
+    const refreshToken = createRefreshToken(foundUser);
+    console.log("9. Refresh token created");
+
+    //store refresh token in secure http cookie
+    console.log("10. Setting cookie...");
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
+    console.log("11. Cookie set");
+
+    //send the access token to the client
+    console.log("12. Sending response...");
+    console.log("=== LOGIN END ===");
+    return res.status(200).json({ accessToken });
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
 };
 
 //for when we ned to refresh the access tokens
