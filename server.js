@@ -18,6 +18,8 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ];
 
+console.log("🔍 CORS Debug - Allowed origins:", allowedOrigins);
+
 //connect to mongodb (consult db.js)
 connectDB();
 

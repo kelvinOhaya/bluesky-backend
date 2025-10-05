@@ -105,9 +105,14 @@ exports.login = async (req, res) => {
       sameSite: "None",
       secure: true,
       path: "/",
+      // Add maxAge for better debugging
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
     console.log("Cookie options:", cookieOptions);
     console.log("NODE_ENV:", process.env.NODE_ENV);
+    console.log("Request origin:", req.headers.origin);
+    console.log("Request host:", req.headers.host);
+
     res.cookie("refreshToken", refreshToken, cookieOptions);
     console.log(
       "11. Cookie set with token:",
