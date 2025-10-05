@@ -50,9 +50,8 @@ exports.signUp = async (req, res) => {
   //store refresh token in secure http cookie
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-    secure: process.env.NODE_ENV === "production",
-    domain: undefined,
+    sameSite: "None",
+    secure: true,
     path: "/",
   });
 
@@ -101,14 +100,19 @@ exports.login = async (req, res) => {
 
     //store refresh token in secure http cookie
     console.log("10. Setting cookie...");
-    res.cookie("refreshToken", refreshToken, {
+    const cookieOptions = {
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      secure: process.env.NODE_ENV === "production",
-      domain: undefined,
+      sameSite: "None",
+      secure: true,
       path: "/",
-    });
-    console.log("11. Cookie set");
+    };
+    console.log("Cookie options:", cookieOptions);
+    console.log("NODE_ENV:", process.env.NODE_ENV);
+    res.cookie("refreshToken", refreshToken, cookieOptions);
+    console.log(
+      "11. Cookie set with token:",
+      refreshToken.substring(0, 20) + "..."
+    );
 
     //send the access token to the client
     console.log("12. Sending response...");
@@ -129,10 +133,19 @@ exports.refreshToken = (req, res) => {
   //import the jsonwebtoken library for verification
   const jwt = require("jsonwebtoken");
 
+  console.log("=== REFRESH TOKEN START ===");
+  console.log("All cookies:", req.cookies);
+  console.log("RefreshToken cookie exists:", !!req.cookies.refreshToken);
+
   //take the refresh token from the client's cookies
   //if there is no token, send a 401 status to the client
   const token = req.cookies.refreshToken;
-  if (!token) return res.sendStatus(401);
+  if (!token) {
+    console.log("No refresh token found in cookies");
+    return res.sendStatus(401);
+  }
+
+  console.log("Found refresh token:", token.substring(0, 20) + "...");
 
   //verify the refresh token, and sent the user a new access token if it is valid. Otherwise send a 403 status error telling the user they are unauthorized
   jwt.verify(token, process.env.REFRESH_SECRET, (error, user) => {

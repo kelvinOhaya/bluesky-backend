@@ -336,6 +336,7 @@ exports.sendInfo = async (req, res) => {
 };
 
 exports.loadMessages = async (req, res) => {
+  console.log("Load messages endpoint reached");
   const { currentChatId } = req.body;
   try {
     const foundMessages = await Message.find({
