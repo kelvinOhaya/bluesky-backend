@@ -66,69 +66,39 @@ exports.signUp = async (req, res) => {
 
 //login logic
 exports.login = async (req, res) => {
-  console.log("=== LOGIN START ===");
   const { username, password } = req.body;
-  console.log("Received data:", { username, passwordLength: password?.length });
 
   try {
     //check if the user exists and the password matches
-    console.log("1. Looking for user...");
     const foundUser = await User.findOne({ username });
-    console.log("2. User found:", !!foundUser);
 
     if (!foundUser) {
-      console.log("3. User not found, returning 401");
       return res.status(401).json({ error: "invalid credentials" });
     }
 
     //check if the password entered matches with the password in the database
-    console.log("4. Checking password...");
     const match = await foundUser.matchPassword(password);
-    console.log("5. Password match:", match);
 
     if (!match) {
-      console.log("6. Password mismatch, returning 401");
       return res.status(401).json({ error: "invalid credentials" });
     }
 
     //grant access and refresh tokens (check jwt.js for details)
-    console.log("7. Creating tokens...");
     const accessToken = createAccessToken(foundUser);
-    console.log("8. Access token created");
     const refreshToken = createRefreshToken(foundUser);
-    console.log("9. Refresh token created");
 
     //store refresh token in secure http cookie
-    console.log("10. Setting cookie...");
-    const cookieOptions = {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       sameSite: "None",
       secure: true,
       path: "/",
-      // Add maxAge for better debugging
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    };
-    console.log("Cookie options:", cookieOptions);
-    console.log("NODE_ENV:", process.env.NODE_ENV);
-    console.log("Request origin:", req.headers.origin);
-    console.log("Request host:", req.headers.host);
-
-    res.cookie("refreshToken", refreshToken, cookieOptions);
-    console.log(
-      "11. Cookie set with token:",
-      refreshToken.substring(0, 20) + "..."
-    );
+    });
 
     //send the access token to the client
-    console.log("12. Sending response...");
-    console.log("=== LOGIN END ===");
-
-    // result headers
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Content-Type", "application/json");
     return res.status(200).json({ accessToken });
   } catch (error) {
-    console.error("LOGIN ERROR:", error);
     return res.status(500).json({ error: "Server error" });
   }
 };
@@ -138,28 +108,19 @@ exports.refreshToken = (req, res) => {
   //import the jsonwebtoken library for verification
   const jwt = require("jsonwebtoken");
 
-  console.log("=== REFRESH TOKEN START ===");
-  console.log("All cookies:", req.cookies);
-  console.log("RefreshToken cookie exists:", !!req.cookies.refreshToken);
-
   //take the refresh token from the client's cookies
   //if there is no token, send a 401 status to the client
   const token = req.cookies.refreshToken;
   if (!token) {
-    console.log("No refresh token found in cookies");
     return res.sendStatus(401);
   }
-
-  console.log("Found refresh token:", token.substring(0, 20) + "...");
 
   //verify the refresh token, and sent the user a new access token if it is valid. Otherwise send a 403 status error telling the user they are unauthorized
   jwt.verify(token, process.env.REFRESH_SECRET, (error, user) => {
     if (error) {
-      console.log(error);
       return res.sendStatus(403);
     }
     const accessToken = createAccessToken({ _id: user.id });
-    console.log("Login finished!");
     res.json({ accessToken });
   });
 };
