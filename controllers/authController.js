@@ -50,10 +50,10 @@ exports.signUp = async (req, res) => {
   //store refresh token in secure http cookie
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: "Lax",
-    secure: process.env.NODE_ENV === "production", // Only require HTTPS in production
+    sameSite: "None",
+    secure: true,
     path: "/",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days - consistent with login
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
   const foundUser = await User.findOne({ username }).select("");
@@ -91,10 +91,9 @@ exports.login = async (req, res) => {
     //store refresh token in secure http cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite: "Lax",
-      secure: process.env.NODE_ENV === "production", // Only require HTTPS in production
+      sameSite: "None",
+      secure: true,
       path: "/",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     //send the access token to the client
@@ -133,8 +132,8 @@ exports.logout = (req, res) => {
   try {
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only require HTTPS in production
-      sameSite: "Lax",
+      secure: true,
+      sameSite: "None",
       path: "/",
     });
     return res.sendStatus(204);
