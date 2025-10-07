@@ -14,8 +14,10 @@ const path = require("path");
 const { init } = require("./io");
 const initSocket = require("./sockets/chatSocket");
 const allowedOrigins = [
-  `http://localhost:${process.env.FRONTEND_PORT}`,
-  process.env.FRONTEND_URL,
+  `http://localhost:${process.env.FRONTEND_PORT}`, // Vite dev server
+  process.env.FRONTEND_URL, // Production Netlify
+  "http://localhost:3000", // Alternative dev port
+  "http://127.0.0.1:5173", // Alternative localhost format
 ];
 
 //connect to mongodb (consult db.js)
@@ -23,6 +25,9 @@ connectDB();
 
 //make an express instance
 const app = express();
+
+// Trust proxy for Railway/Netlify deployment
+app.set("trust proxy", 1);
 
 //connect to socket.io
 const server = http.createServer(app);
@@ -32,6 +37,15 @@ initSocket(io);
 //allows use for json, parsing cookies, and cors
 app.use(express.json());
 app.use(cookieParser());
+
+// Debug middleware (remove in production)
+if (process.env.NODE_ENV !== "production") {
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+    next();
+  });
+}
+
 app.use(
   cors({
     credentials: true, //allows us to use cookies in our requests

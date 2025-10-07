@@ -51,8 +51,9 @@ exports.signUp = async (req, res) => {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     sameSite: "Lax",
-    secure: true,
+    secure: process.env.NODE_ENV === "production", // Only require HTTPS in production
     path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days - consistent with login
   });
 
   const foundUser = await User.findOne({ username }).select("");
@@ -91,7 +92,7 @@ exports.login = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       sameSite: "Lax",
-      secure: true,
+      secure: process.env.NODE_ENV === "production", // Only require HTTPS in production
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -132,7 +133,7 @@ exports.logout = (req, res) => {
   try {
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production", // Only require HTTPS in production
       sameSite: "Lax",
       path: "/",
     });
