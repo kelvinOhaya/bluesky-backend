@@ -47,22 +47,16 @@ exports.signUp = async (req, res) => {
   const accessToken = createAccessToken(newUser);
   const refreshToken = createRefreshToken(newUser);
 
-  //store refresh token in secure http cookie
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    sameSite: "None",
-    secure: true,
-    path: "/",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
-
   const foundUser = await User.findOne({ username }).select("");
   await ChatRoom.findByIdAndUpdate("68c0671711b70a88b9b0cd90", {
     $addToSet: { members: foundUser._id },
   });
 
-  //send the access token to the client
-  return res.status(200).json({ accessToken: accessToken });
+  //send both tokens to the client
+  return res.status(200).json({
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  });
 };
 
 //login logic
@@ -88,16 +82,11 @@ exports.login = async (req, res) => {
     const accessToken = createAccessToken(foundUser);
     const refreshToken = createRefreshToken(foundUser);
 
-    //store refresh token in secure http cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-      path: "/",
+    //send both tokens to the client
+    return res.status(200).json({
+      accessToken,
+      refreshToken,
     });
-
-    //send the access token to the client
-    return res.status(200).json({ accessToken });
   } catch (error) {
     return res.status(500).json({ error: "Server error" });
   }
@@ -108,9 +97,8 @@ exports.refreshToken = (req, res) => {
   //import the jsonwebtoken library for verification
   const jwt = require("jsonwebtoken");
 
-  //take the refresh token from the client's cookies
-  //if there is no token, send a 401 status to the client
-  const token = req.cookies.refreshToken;
+  //take the refresh token from the request body or headers
+  const token = req.body.refreshToken || req.headers["x-refresh-token"];
   if (!token) {
     return res.sendStatus(401);
   }
@@ -121,25 +109,19 @@ exports.refreshToken = (req, res) => {
       return res.sendStatus(403);
     }
     const accessToken = createAccessToken({ _id: user.id });
-    res.json({ accessToken });
+    const newRefreshToken = createRefreshToken({ _id: user.id });
+    res.json({
+      accessToken,
+      refreshToken: newRefreshToken,
+    });
   });
 };
 
 //logout logic
 exports.logout = (req, res) => {
-  //try to clear the refresh token cookie
-  //if there's an error, log it in the console
-  try {
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      path: "/",
-    });
-    return res.sendStatus(204);
-  } catch (error) {
-    console.log("Error: ", error);
-  }
+  // Since we're not using cookies, logout is handled client-side
+  // Just return success - the client will remove the tokens
+  return res.sendStatus(204);
 };
 
 //  logic for when the client requests their user data
