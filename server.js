@@ -16,6 +16,8 @@ const initSocket = require("./sockets/chatSocket");
 const allowedOrigins = [
   `http://localhost:${process.env.FRONTEND_PORT}`,
   process.env.FRONTEND_URL,
+  "https://arid-rena-overbulkily.ngrok-free.dev",
+  process.env.FRONTEND_NETWORK_URL,
 ];
 
 //connect to mongodb (consult db.js)
@@ -35,7 +37,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true, //allows us to use cookies in our requests
-    origin: allowedOrigins,
+    origin: true, // Allow all origins for development/mobile testing
     //allow the frontend to make requests to this server
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -49,6 +51,6 @@ app.use("/api/chatroom", chatRoomRoutes);
 app.use("/api/upload", uploadRoutes);
 
 //listen on this port, and do the following function once listening.
-server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+server.listen(port, "0.0.0.0", () => {
+  console.log(`Example app listening on port ${port} on all interfaces`);
 });

@@ -10,6 +10,11 @@ function init(server, allowedOrigins) {
       allowedHeaders: ["Content-Type", "Authorization"],
       methods: ["GET", "POST"],
     },
+    allowEIO3: true,
+    transports: ["websocket", "polling"],
+    polling: {
+      maxHttpBufferSize: 1e8,
+    },
   });
   return io;
 }
