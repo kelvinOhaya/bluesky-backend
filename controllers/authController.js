@@ -5,6 +5,9 @@ const { generateJoinCode } = require("../utils/utils");
 const { ObjectId } = require("mongodb");
 require("dotenv").config();
 
+//regex function to remove accidental spaces
+const removeAccidentalSpaces = (str) => str.replace(/\s+/g, " ").trim();
+
 //controller for verifying the sign up input
 exports.verifySignUp = async (req, res) => {
   //destructured names (same as saying "username = req.body.username" etc...)
@@ -65,7 +68,9 @@ exports.login = async (req, res) => {
 
   try {
     //check if the user exists and the password matches
-    const foundUser = await User.findOne({ username: username.trim() });
+    const foundUser = await User.findOne({
+      username: removeAccidentalSpaces(username),
+    });
 
     if (!foundUser) {
       return res.status(401).json({ error: "invalid credentials" });
