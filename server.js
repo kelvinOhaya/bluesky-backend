@@ -16,7 +16,6 @@ const initSocket = require("./sockets/chatSocket");
 const allowedOrigins = [
   `http://localhost:${process.env.FRONTEND_PORT}`,
   process.env.FRONTEND_URL,
-  "https://arid-rena-overbulkily.ngrok-free.dev",
   process.env.FRONTEND_NETWORK_URL,
 ];
 

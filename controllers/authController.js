@@ -88,6 +88,7 @@ exports.login = async (req, res) => {
       refreshToken,
     });
   } catch (error) {
+    console.log(`LOGIN::ERROR:: ${error}`);
     return res.status(500).json({ error: "Server error" });
   }
 };
