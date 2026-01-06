@@ -65,7 +65,7 @@ exports.login = async (req, res) => {
 
   try {
     //check if the user exists and the password matches
-    const foundUser = await User.findOne({ username });
+    const foundUser = await User.findOne({ username: username.trim() });
 
     if (!foundUser) {
       return res.status(401).json({ error: "invalid credentials" });
